@@ -1,0 +1,1492 @@
+/* ==========================================================================
+   KEFFI APARTMENT SUITES - APPLICATION & GATE PASS STYLES
+   ========================================================================== */
+
+/* Header / Navbar */
+.kas-header {
+  background-color: #ffffff;
+  border-bottom: 2px solid var(--brand-black);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.kas-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+}
+
+.kas-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.kas-logo-img {
+  height: 62px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+.kas-logo-link:hover .kas-logo-img {
+  transform: scale(1.02);
+}
+
+.kas-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  list-style: none;
+}
+
+.kas-nav-link {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--brand-black);
+  transition: color 0.15s ease;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.kas-nav-link:hover, .kas-nav-link.active {
+  color: var(--brand-black);
+}
+
+.kas-nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--brand-gold);
+  border-radius: 2px;
+}
+
+/* Mobile Navigation Toggle */
+.mobile-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--brand-black);
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  background: linear-gradient(180deg, #FAFAFA 0%, #FFFFFF 100%);
+  padding: 4.5rem 0 4rem;
+  border-bottom: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  background-color: var(--brand-black);
+  color: var(--brand-gold);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.hero-title {
+  font-family: var(--font-sans);
+  font-size: 3.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--brand-black);
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-sub);
+  max-width: 680px;
+  line-height: 1.6;
+  margin-bottom: 2.25rem;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Quick Search Box */
+.quick-search-card {
+  background: #ffffff;
+  border: 2px solid var(--brand-black);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  margin-top: -2rem;
+  position: relative;
+  z-index: 10;
+}
+
+/* Step Wizard Indicator */
+.wizard-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+
+.wizard-stepper::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  right: 30px;
+  height: 2px;
+  background-color: var(--border-light);
+  z-index: 1;
+}
+
+.step-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+.step-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid var(--border-medium);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+}
+
+.step-node.active .step-circle {
+  background-color: var(--brand-black);
+  border-color: var(--brand-gold);
+  color: var(--brand-gold);
+  box-shadow: 0 0 0 4px var(--brand-gold-subtle);
+}
+
+.step-node.completed .step-circle {
+  background-color: var(--brand-gold);
+  border-color: var(--brand-gold-dark);
+  color: var(--brand-black);
+}
+
+.step-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.step-node.active .step-label {
+  color: var(--brand-black);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   OFFICIAL PHYSICAL GATE PASS STYLED REPLICA
+   ========================================================================== */
+.kas-pass-paper {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 2.75rem 2.75rem;
+  border: 2px solid #222222;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.04);
+  position: relative;
+  color: #111111;
+  font-family: var(--font-sans);
+  background-image: 
+    radial-gradient(circle at 100% 100%, rgba(243, 196, 40, 0.03) 0%, transparent 60%),
+    radial-gradient(circle at 0% 0%, rgba(243, 196, 40, 0.03) 0%, transparent 60%);
+}
+
+/* Decorative Corner Accents */
+.pass-corner-accent {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+.pass-corner-tl {
+  top: 12px;
+  left: 12px;
+}
+
+.pass-corner-tr {
+  top: 12px;
+  right: 12px;
+  transform: scaleX(-1);
+}
+
+.pass-corner-bl {
+  bottom: 12px;
+  left: 12px;
+  transform: scaleY(-1);
+}
+
+.pass-corner-br {
+  bottom: 12px;
+  right: 12px;
+  transform: scale(-1, -1);
+}
+
+/* Pass Header */
+.pass-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.pass-logo-img {
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+  margin: 0 auto 0.5rem;
+  display: block;
+}
+
+.pass-title-main {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #0a0a0a;
+  margin-bottom: 0.4rem;
+  line-height: 1.25;
+}
+
+.pass-subtitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2b2b2b;
+  margin-bottom: 1.75rem;
+}
+
+/* Dotted Line Fields */
+.pass-field-row {
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: flex-end;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  position: relative;
+}
+
+.pass-field-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #111111;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.pass-field-dotted-fill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-left: 0.5rem;
+  border-bottom: 2px dotted #555555;
+  min-height: 32px;
+}
+
+.pass-field-value {
+  position: absolute;
+  bottom: 2px;
+  left: 15%;
+  right: 15%;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Date Range Dual Field */
+.pass-dates-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.pass-date-block {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  font-size: 1.05rem;
+}
+
+.pass-date-dotted-fill {
+  flex: 1;
+  position: relative;
+  margin-left: 0.5rem;
+  border-bottom: 2px dotted #555555;
+  min-height: 28px;
+}
+
+.pass-date-value {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+/* Signature Rows */
+.pass-signatures-section {
+  margin-top: 2.25rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.pass-sig-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pass-sig-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #111111;
+  letter-spacing: 0.03em;
+}
+
+.pass-sig-line-container {
+  position: relative;
+  border-bottom: 2px dotted #555555;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pass-sig-image {
+  max-height: 65px;
+  max-width: 240px;
+  object-fit: contain;
+  filter: contrast(1.15);
+}
+
+/* Bottom Official Notice */
+.pass-notice-box {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1.5px solid #e5e7eb;
+  font-size: 0.925rem;
+  line-height: 1.5;
+  color: #222222;
+}
+
+.pass-notice-nb {
+  font-weight: 800;
+  color: #000000;
+}
+
+.pass-notice-italic {
+  font-style: italic;
+  margin-top: 0.35rem;
+  font-weight: 500;
+}
+
+/* Watermark if Expired */
+.pass-expired-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-32deg);
+  font-size: 5.5rem;
+  font-weight: 900;
+  color: rgba(220, 38, 38, 0.15);
+  border: 8px solid rgba(220, 38, 38, 0.2);
+  padding: 0.75rem 3rem;
+  border-radius: 12px;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+}
+
+/* Pass Security Footer */
+.pass-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   FACILITY MANAGER DASHBOARD
+   ========================================================================== */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-surface);
+}
+
+.admin-sidebar {
+  width: 280px;
+  background-color: var(--brand-black);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-right: 2px solid #27272a;
+}
+
+.admin-sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #27272a;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-nav {
+  padding: 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #a1a1aa;
+  transition: all 0.15s ease;
+}
+
+.admin-nav-item:hover {
+  background-color: #27272a;
+  color: #ffffff;
+}
+
+.admin-nav-item.active {
+  background-color: var(--brand-gold);
+  color: var(--brand-black);
+  font-weight: 700;
+}
+
+.admin-sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #27272a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.admin-topbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-main-view {
+  padding: 2rem;
+  flex: 1;
+}
+
+/* Stat Grid */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-medium);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--brand-black);
+  line-height: 1.1;
+  margin-top: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Data Table */
+.kas-table-container {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.kas-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.kas-table th {
+  background-color: var(--bg-surface);
+  padding: 0.875rem 1.25rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.kas-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.kas-table tr:hover td {
+  background-color: #fbfbfb;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modal-header {
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-body {
+  padding: 1.75rem;
+}
+
+.modal-footer {
+  padding: 1.25rem 1.75rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background-color: var(--bg-surface);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .kas-nav-links {
+    gap: 1.25rem;
+  }
+  .kas-nav-link {
+    font-size: 0.875rem;
+  }
+  .hero-title {
+    font-size: 2.75rem;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  }
+  .admin-sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 900px) {
+  .kas-nav-links {
+    display: none;
+  }
+  .mobile-nav-toggle {
+    display: block;
+  }
+  .hero-title {
+    font-size: 2.25rem;
+  }
+  .hero-subtitle {
+    font-size: 1.125rem;
+  }
+  .kas-header-inner {
+    height: 70px;
+  }
+  .kas-logo-img {
+    height: 52px;
+  }
+  .admin-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 90;
+    width: min(280px, 85vw);
+    /* `visibility` keeps the closed drawer out of the tab order and away from
+       screen readers; translating alone would leave it focusable off-screen. */
+    transform: translateX(-100%);
+    visibility: hidden;
+    overflow-y: auto;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .admin-sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.25s ease, visibility 0s;
+  }
+  .admin-topbar {
+    padding: 1rem 1.5rem;
+  }
+  .admin-main-view {
+    padding: 1.5rem;
+  }
+  .kas-pass-paper {
+    padding: 2rem 1.5rem 1.75rem;
+  }
+  .pass-title-main {
+    font-size: 1.2rem;
+  }
+  .pass-field-value {
+    font-size: 1.05rem;
+  }
+  .pass-dates-row {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  .modal-card {
+    max-width: 90vw;
+    margin: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 3rem 0 2.5rem;
+  }
+  .hero-title {
+    font-size: 1.875rem;
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .quick-search-card {
+    margin-top: -1rem;
+    padding: 1.25rem;
+  }
+  .wizard-stepper {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .wizard-stepper::before {
+    display: none;
+  }
+  .step-node {
+    flex: 1;
+    min-width: 80px;
+  }
+  .kas-pass-paper {
+    padding: 1.5rem 1rem 1.25rem;
+    max-width: 100%;
+  }
+  .pass-logo-img {
+    height: 70px;
+  }
+  .pass-title-main {
+    font-size: 1.1rem;
+  }
+  .pass-subtitle {
+    font-size: 0.9rem;
+  }
+  .pass-field-row {
+    font-size: 1rem;
+  }
+  .pass-field-value {
+    font-size: 1rem;
+    left: 20%;
+  }
+  .pass-sig-image {
+    max-height: 50px;
+    max-width: 180px;
+  }
+  .pass-notice-box {
+    font-size: 0.85rem;
+  }
+  .stat-grid {
+    /* Two up on tablets; a single column only once the screen is phone-sized. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .kas-table-container {
+    overflow-x: auto;
+  }
+  .kas-table {
+    min-width: 600px;
+  }
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1.25rem;
+  }
+  .admin-topbar {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .admin-main-view {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .kas-header-inner {
+    height: 60px;
+  }
+  .kas-logo-img {
+    height: 45px;
+  }
+  .hero-section {
+    padding: 2.5rem 0 2rem;
+  }
+  .hero-title {
+    font-size: 1.5rem;
+  }
+  .hero-subtitle {
+    font-size: 0.9375rem;
+  }
+  .hero-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+  }
+  .step-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8125rem;
+  }
+  .step-label {
+    font-size: 0.75rem;
+  }
+  .kas-pass-paper {
+    padding: 1.25rem 0.75rem 1rem;
+  }
+  .pass-logo-img {
+    height: 60px;
+  }
+  .pass-title-main {
+    font-size: 1rem;
+  }
+  .pass-subtitle {
+    font-size: 0.85rem;
+  }
+  .pass-field-row {
+    font-size: 0.9375rem;
+    margin-bottom: 1.25rem;
+  }
+  .pass-field-label {
+    font-size: 0.875rem;
+  }
+  .pass-field-value {
+    font-size: 0.9375rem;
+    left: 25%;
+  }
+  .pass-date-block {
+    font-size: 0.9375rem;
+  }
+  .pass-date-value {
+    font-size: 1rem;
+  }
+  .pass-sig-label {
+    font-size: 0.875rem;
+  }
+  .pass-sig-line-container {
+    min-height: 55px;
+  }
+  .pass-sig-image {
+    max-height: 45px;
+    max-width: 150px;
+  }
+  .pass-notice-box {
+    font-size: 0.8125rem;
+  }
+  .pass-meta-bar {
+    font-size: 0.6875rem;
+  }
+  .pass-corner-accent {
+    width: 40px;
+    height: 40px;
+  }
+  .pass-corner-tl,
+  .pass-corner-tr {
+    top: 8px;
+  }
+  .pass-corner-bl,
+  .pass-corner-br {
+    bottom: 8px;
+  }
+  .pass-corner-tl,
+  .pass-corner-bl {
+    left: 8px;
+  }
+  .pass-corner-tr,
+  .pass-corner-br {
+    right: 8px;
+  }
+  .stat-card {
+    padding: 1.25rem;
+  }
+  .stat-value {
+    font-size: 1.75rem;
+  }
+  .kas-table th,
+  .kas-table td {
+    padding: 0.75rem 1rem;
+  }
+  .modal-card {
+    max-height: 95vh;
+  }
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kas-header-inner {
+    height: 55px;
+  }
+  .kas-logo-img {
+    height: 40px;
+  }
+  .hero-section {
+    padding: 2rem 0 1.5rem;
+  }
+  .hero-title {
+    font-size: 1.25rem;
+  }
+  .hero-subtitle {
+    font-size: 0.875rem;
+  }
+  .kas-pass-paper {
+    padding: 1rem 0.5rem 0.75rem;
+  }
+  .pass-logo-img {
+    height: 50px;
+  }
+  .pass-title-main {
+    font-size: 0.9375rem;
+  }
+  .pass-subtitle {
+    font-size: 0.8125rem;
+  }
+  .pass-field-row {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  .pass-field-value {
+    font-size: 0.875rem;
+    left: 30%;
+  }
+  .pass-sig-line-container {
+    min-height: 45px;
+  }
+  .pass-sig-image {
+    max-height: 40px;
+    max-width: 120px;
+  }
+  .pass-notice-box {
+    font-size: 0.75rem;
+  }
+  .pass-expired-watermark {
+    font-size: 3.5rem;
+    padding: 0.5rem 2rem;
+  }
+  .stat-card {
+    padding: 1rem;
+  }
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+  }
+  .kas-table th,
+  .kas-table td {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Mobile Navigation Menu */
+.mobile-nav-menu {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-bottom: 2px solid var(--brand-black);
+  padding: 1rem;
+  z-index: 49;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-nav-menu.open {
+  display: block;
+}
+
+.mobile-nav-item {
+  display: block;
+  padding: 0.875rem 1rem;
+  color: var(--brand-black);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item.active {
+  background-color: var(--bg-surface);
+}
+
+@media (max-width: 900px) {
+  .mobile-nav-menu {
+    top: 60px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobile-nav-menu {
+    top: 55px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-nav-menu {
+    top: 50px;
+  }
+}
+
+/* Admin Sidebar Overlay */
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 85;
+}
+
+.admin-sidebar-overlay.open {
+  display: block;
+}
+
+/* Responsive Forms */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .form-col {
+    width: 100%;
+  }
+}
+
+/* Responsive Buttons */
+@media (max-width: 640px) {
+  .btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+  .btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
+  }
+}
+
+/* ==========================================================================
+   Responsive refinements
+   Breakpoints: 1024 laptop · 900 tablet/drawer · 768 tablet · 640 phone
+                480 small phone · 380 very small phone
+   ========================================================================== */
+
+/* --- Admin topbar ------------------------------------------------------- */
+.admin-topbar-lead {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0; /* lets the heading truncate instead of pushing the actions out */
+  flex: 1 1 auto;
+}
+
+.admin-topbar-heading {
+  min-width: 0;
+}
+
+.admin-topbar-heading h1 {
+  font-size: clamp(1rem, 0.85rem + 0.7vw, 1.25rem);
+  font-weight: 800;
+  color: var(--brand-black);
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.admin-topbar-heading span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Two labels per button: the full one, and a short one for narrow screens. */
+.btn-label-short {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  /* The subtitle is decorative; the page title already says where you are. */
+  .admin-topbar-heading span {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-topbar {
+    padding: 0.625rem 0.875rem;
+  }
+  .admin-topbar-heading h1 {
+    /* Two lines max, then ellipsis, so the header can never grow unbounded. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .admin-topbar-actions {
+    gap: 0.5rem;
+  }
+  .admin-topbar-actions .btn-label {
+    display: none;
+  }
+  .admin-topbar-actions .btn-label-short {
+    display: inline;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Below this the title and both buttons cannot share a row legibly. */
+  .admin-topbar-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .admin-topbar-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .admin-topbar-actions .btn-label-short {
+    display: none;
+  }
+  .admin-topbar-actions .btn-label {
+    display: inline;
+  }
+}
+
+/* --- Fluid headings ----------------------------------------------------- */
+/* Replaces the stepped font sizes so text scales continuously rather than
+   jumping at each breakpoint and overflowing in between. */
+.hero-title {
+  font-size: clamp(1.5rem, 1rem + 4.2vw, 3.25rem);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.hero-subtitle {
+  font-size: clamp(0.9375rem, 0.85rem + 0.6vw, 1.25rem);
+}
+
+.section-title {
+  overflow-wrap: break-word;
+}
+
+/* Long unbroken words (suite names, emails, pass ids) must never push a
+   layout wider than the screen. */
+h1, h2, h3, h4, p, span, td, th, label {
+  overflow-wrap: break-word;
+}
+
+/* --- Tables ------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .kas-table-container {
+    /* `overflow: hidden` on the base rule would clip the scroll area. */
+    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .kas-table-container::after {
+    /* Hairline hint that there is more table to the right. */
+    content: '';
+    position: sticky;
+    right: 0;
+    top: 0;
+    display: block;
+    width: 1.5rem;
+    margin-left: -1.5rem;
+    pointer-events: none;
+  }
+}
+
+/* --- Touch targets ------------------------------------------------------ */
+@media (pointer: coarse) {
+  .btn,
+  .admin-nav-item,
+  .mobile-nav-item,
+  .mobile-nav-toggle {
+    min-height: 44px;
+  }
+  .btn-sm {
+    min-height: 38px;
+  }
+}
+
+/* --- Very small phones (<=380px) ---------------------------------------- */
+@media (max-width: 380px) {
+  .kas-container,
+  .admin-main-view {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  .card {
+    padding: 1rem !important;
+  }
+  .btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+  .wizard-stepper {
+    gap: 0.5rem;
+  }
+  .step-node {
+    min-width: 56px;
+  }
+  .step-label {
+    font-size: 0.625rem;
+  }
+}
+
+/* --- Respect reduced-motion -------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar,
+  .admin-sidebar-overlay {
+    transition: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .stat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- Official pass card: dotted-line fields ----------------------------- */
+/* The value used to be absolutely positioned, which gave long guest names no
+   width to respect. In normal flow it wraps and the slot grows instead. */
+.pass-line-row {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  min-width: 0;
+}
+
+.pass-line-slot {
+  flex: 1;
+  min-width: 0;
+  border-bottom: 2px dotted #444444;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.pass-line-value {
+  font-weight: 700;
+  color: #000000;
+  text-align: center;
+  max-width: 100%;
+  padding-bottom: 2px;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.pass-line-dates {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  /* Two date fields cannot share a phone row and stay readable. */
+  .pass-line-dates {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.4rem;
+  }
+  .pass-line-value {
+    font-size: 1.05rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Label above value: side by side leaves too little room for either. */
+  .pass-line-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.15rem;
+  }
+  .pass-line-slot {
+    margin-left: 0 !important;
+    justify-content: flex-start;
+  }
+  .pass-line-value {
+    text-align: left;
+    font-size: 1rem !important;
+  }
+}
+
+/* --- Official pass card: signature rows --------------------------------- */
+.pass-sig-row {
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.pass-sig-caption {
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #000000;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.pass-sig-slot {
+  flex: 1;
+  /* Without this the slot cannot shrink below the signature image, and the
+     long nowrap caption pushes the whole row past the card edge. */
+  min-width: 0;
+  border-bottom: 2px dotted #444444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pass-sig-img {
+  /* Cap by the space actually available, not a fixed 240px. */
+  max-width: min(240px, 100%);
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  /* "FACILITY MANAGER'S SIGNATURE:" cannot share a phone row with the line. */
+  .pass-sig-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+  .pass-sig-caption {
+    white-space: normal;
+    font-size: 0.9rem;
+  }
+  .pass-sig-slot {
+    margin-left: 0 !important;
+  }
+}
+
+/* --- Official pass card: metadata bar ----------------------------------- */
+/* Two `space-between` groups with no wrap: the long monospace pass id and the
+   check-in/out + badge group could not share a phone-width card. */
+.pass-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.pass-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.pass-meta-id {
+  font-family: monospace;
+  font-weight: 800;
+  color: #1e293b;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .pass-meta-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* --- Registration wizard navigation ------------------------------------- */
+.wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+}
+
+@media (max-width: 560px) {
+  /* "Back" and "Continue to Next Step" cannot share a phone row; stacking
+     also puts the primary action under the thumb. */
+  .wizard-nav {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .wizard-nav .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* --- Checkboxes --------------------------------------------------------- */
+.kas-checkbox {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+@media (pointer: coarse) {
+  /* WCAG 2.5.8 puts the minimum touch target at 24x24 CSS px. */
+  .kas-checkbox {
+    width: 24px;
+    height: 24px;
+  }
+}

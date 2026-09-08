@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="#222222" stroke-width="1.2">
+  <!-- Outer Corner Frame -->
+  <path d="M 5,95 L 5,5 L 95,5" stroke-width="1.5" stroke="#333333" />
+  <path d="M 12,90 L 12,12 L 90,12" stroke-width="0.8" stroke="#F3C428" stroke-opacity="0.8" />
+  
+  <!-- Radiating Sunburst Fan from Corner (0,0) -->
+  <line x1="12" y1="12" x2="80" y2="22" stroke-width="0.75" stroke="#444444" stroke-dasharray="1 1.5"/>
+  <line x1="12" y1="12" x2="70" y2="35" stroke-width="0.75" stroke="#444444"/>
+  <line x1="12" y1="12" x2="55" y2="55" stroke-width="1" stroke="#F3C428"/>
+  <line x1="12" y1="12" x2="35" y2="70" stroke-width="0.75" stroke="#444444"/>
+  <line x1="12" y1="12" x2="22" y2="80" stroke-width="0.75" stroke="#444444" stroke-dasharray="1 1.5"/>
+
+  <!-- Subtle Diamond & Dots -->
+  <polygon points="12,12 18,15 15,18 9,15" fill="#F3C428" stroke="#111111" stroke-width="0.5"/>
+  <circle cx="55" cy="55" r="1.5" fill="#111111"/>
+  <circle cx="80" cy="22" r="1.2" fill="#F3C428"/>
+  <circle cx="22" cy="80" r="1.2" fill="#F3C428"/>
+</svg>
