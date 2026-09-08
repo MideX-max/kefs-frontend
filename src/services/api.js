@@ -1,7 +1,10 @@
 // In development, use Vite's /api proxy (configured to forward to the local
 // backend on port 5001). Production deployments supply VITE_API_URL instead.
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
-const API_ORIGIN = new URL(API_BASE_URL, window.location.origin).origin;
+const rawApiUrl = (import.meta.env.VITE_API_URL || '/api').trim();
+const API_BASE_URL = rawApiUrl.replace(/\/+$/, '');
+const API_ORIGIN = API_BASE_URL.startsWith('http')
+  ? new URL(API_BASE_URL).origin
+  : (typeof window !== 'undefined' ? window.location.origin : '');
 
 function authHeaders(token) {
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -46,8 +49,23 @@ async function parseJsonResponse(res) {
 }
 
 async function requestJson(path, options = {}) {
-  const res = await fetch(`${API_BASE_URL}${path}`, options);
-  return parseJsonResponse(res);
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const url = `${API_BASE_URL}${normalizedPath}`;
+  try {
+    const res = await fetch(url, options);
+    return parseJsonResponse(res);
+  } catch (err) {
+    if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+      const isConfigured = Boolean(import.meta.env.VITE_API_URL);
+      const hint = isConfigured
+        ? `Could not reach the backend API at ${url}. Please verify the server is running and CORS is allowed.`
+        : 'Backend API connection failed. If deployed on Vercel, please set the VITE_API_URL environment variable to your backend URL (e.g. https://your-backend.vercel.app/api).';
+      const connectionError = new Error(hint);
+      connectionError.status = 503;
+      throw connectionError;
+    }
+    throw err;
+  }
 }
 
 export const api = {
