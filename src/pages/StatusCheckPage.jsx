@@ -3,7 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { useReservations } from '../context/ReservationContext.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { formatDatePass } from '../utils/constants.js';
-import { Search, ArrowRight, AlertCircle, CalendarPlus, CheckCircle2 } from 'lucide-react';
+import { Search, ArrowRight, AlertCircle, CalendarPlus, CheckCircle2, Clock } from 'lucide-react';
 
 export default function StatusCheckPage() {
   const [searchParams] = useSearchParams();
@@ -52,11 +52,11 @@ export default function StatusCheckPage() {
       if (updated) {
         setResult(updated);
       }
-      setExtendSuccess(`Stay successfully extended to ${formatDatePass(newCheckOutDate)}!`);
+      setExtendSuccess(`Extension request submitted for ${formatDatePass(newCheckOutDate)}! Awaiting Facility Manager verification.`);
       setShowExtend(false);
       setNewCheckOutDate('');
     } catch (err) {
-      setExtendError(err.message || 'Failed to extend stay. Please try again.');
+      setExtendError(err.message || 'Failed to request stay extension. Please try again.');
     } finally {
       setExtending(false);
     }
@@ -203,6 +203,20 @@ export default function StatusCheckPage() {
                   <div style={{ marginBottom: '1.25rem', padding: '0.875rem 1rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--radius-md)', color: '#166534', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <CheckCircle2 size={18} />
                     <strong>{extendSuccess}</strong>
+                  </div>
+                )}
+
+                {result.extensionRequest?.status === 'pending' && (
+                  <div style={{ marginBottom: '1.25rem', padding: '1rem 1.25rem', backgroundColor: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    <Clock size={20} style={{ color: '#d97706', marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <strong style={{ display: 'block', color: '#92400e', fontSize: '0.95rem' }}>
+                        Stay Extension Request Pending Verification
+                      </strong>
+                      <span style={{ fontSize: '0.85rem', color: '#b45309' }}>
+                        Requested new check-out date: <strong>{formatDatePass(result.extensionRequest.requestedCheckOutDate)}</strong>. A Facility Manager is reviewing your request.
+                      </span>
+                    </div>
                   </div>
                 )}
 

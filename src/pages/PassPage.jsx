@@ -90,7 +90,7 @@ export default function PassPage() {
       setShowExtendForm(false);
       setNewCheckOutDate('');
     } catch (err) {
-      setExtendError(err.message || 'Failed to extend stay. Please try again.');
+      setExtendError(err.message || 'Failed to request stay extension. Please try again.');
     } finally {
       setExtending(false);
     }
@@ -179,6 +179,12 @@ export default function PassPage() {
                 </span>
               )}
             </p>
+
+            {reservation.extensionRequest?.status === 'pending' && (
+              <div style={{ marginTop: '0.75rem', padding: '0.6rem 0.85rem', backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: 'var(--radius-sm)', color: '#92400e', fontSize: '0.85rem' }}>
+                <strong>Stay Extension Pending:</strong> Request to extend stay until <strong>{formatDatePass(reservation.extensionRequest.requestedCheckOutDate)}</strong> is awaiting Facility Manager verification.
+              </div>
+            )}
           </div>
 
           {/* Quick Action Buttons */}

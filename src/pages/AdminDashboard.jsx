@@ -26,13 +26,17 @@ export default function AdminDashboard() {
   const { user, logout, isAuthenticated, updateProfile, defaultSignature } = useAuth();
   const { 
     reservations, flats, stats, loading, filters, setFilters, 
-    fetchReservations, updateStatus, addFlat 
+    fetchReservations, updateStatus, addFlat, reviewStayExtension
   } = useReservations();
 
   const [activeTab, setActiveTab] = useState('overview'); // overview, reservations, pending, guests, flats, history, settings
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Flats management search and block filter
+  const [flatSearch, setFlatSearch] = useState('');
+  const [flatBlockFilter, setFlatBlockFilter] = useState('All');
 
   // Settings State
   const [profileForm, setProfileForm] = useState(() => ({
@@ -90,6 +94,18 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleReviewExtension = async (id, action, notes) => {
+    try {
+      await reviewStayExtension(id, action, notes);
+      showToast(`Stay extension ${action}d successfully.`);
+      if (selectedReservation && selectedReservation.id === id) {
+        setSelectedReservation(null);
+      }
+    } catch (err) {
+      showToast(err.message || 'Error reviewing stay extension.');
+    }
+  };
+
   const handleAddFlat = async (e) => {
     e.preventDefault();
     setSavingFlat(true);
@@ -122,7 +138,7 @@ export default function AdminDashboard() {
   const getDisplayedReservations = () => {
     let list = [...reservations];
     if (activeTab === 'pending') {
-      return list.filter(r => r.status === 'Pending Review');
+      return list.filter(r => r.status === 'Pending Review' || r.extensionRequest?.status === 'pending');
     }
     if (activeTab === 'history') {
       return list.filter(r => r.status === 'Expired' || r.status === 'Rejected');
@@ -370,6 +386,37 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
+              {/* Pending Stay Extension Requests Notice for Facility Managers */}
+              {reservations.filter(r => r.extensionRequest?.status === 'pending').length > 0 && (
+                <div className="card" style={{ padding: '1.25rem 1.5rem', marginBottom: '1.5rem', backgroundColor: '#fffbeb', border: '1.5px solid #fde68a' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <AlertTriangle size={22} style={{ color: '#d97706', flexShrink: 0 }} />
+                      <div>
+                        <strong style={{ fontSize: '0.95rem', color: '#92400e', display: 'block' }}>
+                          {reservations.filter(r => r.extensionRequest?.status === 'pending').length} Stay Extension Request{reservations.filter(r => r.extensionRequest?.status === 'pending').length > 1 ? 's' : ''} Awaiting Review
+                        </strong>
+                        <span style={{ fontSize: '0.825rem', color: '#b45309' }}>
+                          Guests have requested check-out extensions requiring Facility Manager verification.
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      {reservations.filter(r => r.extensionRequest?.status === 'pending').map(extRes => (
+                        <button
+                          key={extRes.id}
+                          onClick={() => setSelectedReservation(extRes)}
+                          className="btn btn-primary btn-sm"
+                          style={{ fontSize: '0.8rem' }}
+                        >
+                          Review {extRes.guestName} ({extRes.flat})
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Quick Filter Bar */}
               <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: '1 1 240px' }}>
@@ -463,6 +510,11 @@ export default function AdminDashboard() {
                           <td>
                             <span style={{ fontSize: '0.85rem' }}>{formatDatePass(res.checkOutDate)}</span>
                             <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{res.checkOutTime || '11:00'}</span>
+                            {res.extensionRequest?.status === 'pending' && (
+                              <span style={{ marginTop: '2px', display: 'inline-block', fontSize: '0.7rem', color: '#b45309', backgroundColor: '#fef3c7', padding: '1px 5px', borderRadius: '3px', fontWeight: 700 }}>
+                                ⏳ Ext to: {formatDatePass(res.extensionRequest.requestedCheckOutDate)}
+                              </span>
+                            )}
                           </td>
                           <td>
                             <StatusBadge status={res.status} size="sm" />
@@ -541,7 +593,14 @@ export default function AdminDashboard() {
                             <strong>{res.flat}</strong>
                           </td>
                           <td>{formatDatePass(res.checkInDate)}</td>
-                          <td>{formatDatePass(res.checkOutDate)}</td>
+                          <td>
+                            <div>{formatDatePass(res.checkOutDate)}</div>
+                            {res.extensionRequest?.status === 'pending' && (
+                              <div style={{ marginTop: '3px', display: 'inline-block', fontSize: '0.725rem', color: '#b45309', backgroundColor: '#fef3c7', padding: '1px 6px', borderRadius: '3px', fontWeight: 700 }}>
+                                ⏳ Ext req: {formatDatePass(res.extensionRequest.requestedCheckOutDate)}
+                              </div>
+                            )}
+                          </td>
                           <td>
                             <StatusBadge status={res.status} size="sm" />
                           </td>
@@ -710,75 +769,117 @@ export default function AdminDashboard() {
                 </form>
               )}
 
-              {flats.length === 0 ? (
-                <div className="card" style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  No flats registered yet. Use &ldquo;Add New Flat&rdquo; to create the first suite.
+              {/* Flat Search & Block Filter Bar */}
+              <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: '1 1 240px' }}>
+                  <Search size={18} color="var(--text-muted)" />
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Search 144 apartments (e.g. Azalea D6, Darwin, Block C)..."
+                    value={flatSearch}
+                    onChange={(e) => setFlatSearch(e.target.value)}
+                    style={{ padding: '0.5rem 0.75rem', fontSize: '0.875rem' }}
+                  />
                 </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '1.5rem' }}>
-                  {flats.map((flat) => {
-                    const occupancy = FLAT_OCCUPANCY[flat.status] || FLAT_OCCUPANCY.available;
-                    const currentRes = flat.currentPassId
-                      ? reservations.find(r => r.passId === flat.currentPassId)
-                      : null;
 
-                    return (
-                      <div key={flat.id} className="card" style={{ padding: '1.75rem', borderLeft: `5px solid ${occupancy.accent}` }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-black)' }}>
-                            {flat.name}
-                          </h3>
-                          <span className={`badge ${occupancy.badge}`}>{occupancy.label}</span>
-                        </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  {['All', 'Block A', 'Block B', 'Block C', 'Block D', 'Block E', 'Block F'].map(b => (
+                    <button
+                      key={b}
+                      type="button"
+                      onClick={() => setFlatBlockFilter(b)}
+                      className={`btn btn-sm ${flatBlockFilter === b ? 'btn-dark' : 'btn-outline'}`}
+                      style={{ fontSize: '0.8rem', padding: '0.35rem 0.65rem' }}
+                    >
+                      {b}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                          {[flat.block, flat.floor, flat.type].filter(Boolean).join(' • ')}
-                        </div>
+              {(() => {
+                const displayedFlats = flats.filter(flat => {
+                  const q = flatSearch.toLowerCase().trim();
+                  const matchesSearch = !q || flat.name.toLowerCase().includes(q) || flat.block.toLowerCase().includes(q) || flat.type.toLowerCase().includes(q);
+                  const matchesBlock = flatBlockFilter === 'All' || flat.block.toLowerCase() === flatBlockFilter.toLowerCase();
+                  return matchesSearch && matchesBlock;
+                });
 
-                        {flat.currentGuest ? (
-                          <div style={{ backgroundColor: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>
-                              {flat.status === 'reserved' ? 'UPCOMING GUEST' : 'CURRENT GUEST'}
-                            </span>
-                            <strong style={{ fontSize: '1rem', color: 'var(--brand-black)', display: 'block', marginBottom: '0.35rem' }}>
-                              {flat.currentGuest}
-                            </strong>
-                            {currentRes && (
-                              <span style={{ fontSize: '0.8rem', color: 'var(--text-sub)' }}>
-                                Stay: {formatDatePass(currentRes.checkInDate)} &rarr; {formatDatePass(currentRes.checkOutDate)}
+                if (displayedFlats.length === 0) {
+                  return (
+                    <div className="card" style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      No flats match your search or block filter criteria.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: '1.25rem' }}>
+                    {displayedFlats.map((flat) => {
+                      const occupancy = FLAT_OCCUPANCY[flat.status] || FLAT_OCCUPANCY.available;
+                      const currentRes = flat.currentPassId
+                        ? reservations.find(r => r.passId === flat.currentPassId)
+                        : null;
+
+                      return (
+                        <div key={flat.id} className="card" style={{ padding: '1.5rem', borderLeft: `5px solid ${occupancy.accent}` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-black)' }}>
+                              {flat.name}
+                            </h3>
+                            <span className={`badge ${occupancy.badge}`}>{occupancy.label}</span>
+                          </div>
+
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.85rem' }}>
+                            {[flat.block, flat.floor, flat.type].filter(Boolean).join(' • ')}
+                          </div>
+
+                          {flat.currentGuest ? (
+                            <div style={{ backgroundColor: 'var(--bg-surface)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>
+                                {flat.status === 'reserved' ? 'UPCOMING GUEST' : 'CURRENT GUEST'}
                               </span>
-                            )}
-                            <div style={{ marginTop: '0.75rem' }}>
-                              <button
-                                onClick={() => currentRes && setSelectedReservation(currentRes)}
-                                className="btn btn-outline btn-sm"
-                                style={{ width: '100%', fontSize: '0.75rem' }}
-                                disabled={!currentRes}
-                              >
-                                {currentRes ? 'Manage Guest Pass' : flat.currentPassId}
-                              </button>
+                              <strong style={{ fontSize: '0.95rem', color: 'var(--brand-black)', display: 'block', marginBottom: '0.25rem' }}>
+                                {flat.currentGuest}
+                              </strong>
+                              {currentRes && (
+                                <span style={{ fontSize: '0.78rem', color: 'var(--text-sub)' }}>
+                                  Stay: {formatDatePass(currentRes.checkInDate)} &rarr; {formatDatePass(currentRes.checkOutDate)}
+                                </span>
+                              )}
+                              <div style={{ marginTop: '0.65rem' }}>
+                                <button
+                                  onClick={() => currentRes && setSelectedReservation(currentRes)}
+                                  className="btn btn-outline btn-sm"
+                                  style={{ width: '100%', fontSize: '0.75rem' }}
+                                  disabled={!currentRes}
+                                >
+                                  {currentRes ? 'Manage Guest Pass' : flat.currentPassId}
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <div style={{ padding: '1.25rem 0', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                            {flat.description || 'Unit ready for new guest allocation. No active pass registered.'}
-                            <div style={{ marginTop: '1rem' }}>
-                              <button
-                                onClick={() => navigate('/register')}
-                                className="btn btn-outline-gold btn-sm"
-                                style={{ width: '100%' }}
-                              >
-                                <Plus size={14} />
-                                Assign Guest to {flat.name}
-                              </button>
+                          ) : (
+                            <div style={{ padding: '0.85rem 0', color: 'var(--text-muted)', fontSize: '0.825rem' }}>
+                              {flat.description || 'Unit ready for new guest allocation.'}
+                              <div style={{ marginTop: '0.75rem' }}>
+                                <button
+                                  onClick={() => navigate('/register')}
+                                  className="btn btn-outline-gold btn-sm"
+                                  style={{ width: '100%' }}
+                                >
+                                  <Plus size={14} />
+                                  Assign Guest
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -881,6 +982,7 @@ export default function AdminDashboard() {
           reservation={selectedReservation}
           onClose={() => setSelectedReservation(null)}
           onUpdateStatus={handleStatusChange}
+          onReviewExtension={handleReviewExtension}
         />
       )}
 

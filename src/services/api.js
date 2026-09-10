@@ -216,6 +216,22 @@ export const api = {
     };
   },
 
+  async reviewStayExtension(id, { action, notes }, token) {
+    const data = await requestJson(`/reservations/${encodeURIComponent(id)}/review-extension`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(token)
+      },
+      body: JSON.stringify({ action, notes })
+    });
+
+    return {
+      ...data,
+      reservation: normalizeReservation(data.reservation)
+    };
+  },
+
   // `kind` routes the file into the right Cloudinary folder.
   async uploadFile(file, kind = 'id-document') {
     const formData = new FormData();

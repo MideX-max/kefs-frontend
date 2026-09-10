@@ -17,12 +17,15 @@ export const BRAND = {
   }
 };
 
-export const DEFAULT_FLATS = [
-  "Azalea",
-  "Beaumont",
-  "Charleston",
-  "Darwin"
-];
+const BASE_FLAT_NAMES = ["Azalea", "Beaumont", "Charleston", "Darwin"];
+const BLOCKS = ["A", "B", "C", "D", "E", "F"];
+const UNITS = [1, 2, 3, 4, 5, 6];
+
+export const DEFAULT_FLATS = BASE_FLAT_NAMES.flatMap(base =>
+  BLOCKS.flatMap(block =>
+    UNITS.map(unit => `${base} ${block}${unit}`)
+  )
+);
 
 export const ID_TYPES = [
   "International Passport",

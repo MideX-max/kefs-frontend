@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function ReservationModal({ reservation, onClose, onUpdateStatus }) {
+export default function ReservationModal({ reservation, onClose, onUpdateStatus, onReviewExtension }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview'); // overview, documents, actions
   const [actionNotes, setActionNotes] = useState('');
@@ -37,13 +37,27 @@ export default function ReservationModal({ reservation, onClose, onUpdateStatus 
     status,
     autoApproved,
     verificationNotes,
-    createdAt
+    createdAt,
+    extensionRequest
   } = reservation;
 
   const handleStatusChange = async (newStatus) => {
     setSubmitting(true);
     try {
       await onUpdateStatus(id, newStatus, actionNotes || `Status updated to ${newStatus} by Facility Manager.`);
+      onClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReviewExtension = async (action) => {
+    if (!onReviewExtension) return;
+    setSubmitting(true);
+    try {
+      await onReviewExtension(id, action, actionNotes || `Stay extension ${action}d by Facility Manager.`);
       onClose();
     } catch (err) {
       console.error(err);
@@ -130,6 +144,45 @@ export default function ReservationModal({ reservation, onClose, onUpdateStatus 
           {activeTab === 'overview' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
+              {/* Pending Stay Extension Alert Banner */}
+              {extensionRequest?.status === 'pending' && (
+                <div style={{ padding: '1.25rem', backgroundColor: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <AlertTriangle size={20} color="#d97706" />
+                      <strong style={{ color: '#92400e', fontSize: '1rem' }}>
+                        Stay Extension Request Pending Verification
+                      </strong>
+                    </div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#b45309', backgroundColor: '#fef3c7', padding: '2px 8px', borderRadius: '10px' }}>
+                      Action Required
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: '#78350f', margin: '0 0 1rem 0' }}>
+                    Guest has requested to extend their checkout from <strong>{formatDatePass(checkOutDate)}</strong> to <strong>{formatDatePass(extensionRequest.requestedCheckOutDate)}</strong>.
+                  </p>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => handleReviewExtension('approve')}
+                      disabled={submitting}
+                      className="btn btn-primary btn-sm"
+                    >
+                      <CheckCircle size={15} />
+                      Approve Extension
+                    </button>
+                    <button
+                      onClick={() => handleReviewExtension('reject')}
+                      disabled={submitting}
+                      className="btn btn-outline btn-sm"
+                      style={{ color: '#dc2626', borderColor: '#fca5a5' }}
+                    >
+                      <XCircle size={15} />
+                      Reject Extension
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Guest & Contact Card */}
               <div style={{ backgroundColor: 'var(--bg-surface)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
                 <h3 style={{ fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--brand-black)', letterSpacing: '0.04em', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -259,6 +312,39 @@ export default function ReservationModal({ reservation, onClose, onUpdateStatus 
 
           {activeTab === 'actions' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {extensionRequest?.status === 'pending' && (
+                <div style={{ padding: '1.25rem', backgroundColor: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <AlertTriangle size={18} color="#d97706" />
+                    <strong style={{ color: '#92400e', fontSize: '0.95rem' }}>
+                      Stay Extension Request Pending Facility Manager Verification
+                    </strong>
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: '#78350f', margin: '0 0 1rem 0' }}>
+                    Guest requested to extend check-out to: <strong>{formatDatePass(extensionRequest.requestedCheckOutDate)}</strong>
+                  </p>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => handleReviewExtension('approve')}
+                      disabled={submitting}
+                      className="btn btn-primary btn-sm"
+                    >
+                      <CheckCircle size={15} />
+                      Approve Stay Extension
+                    </button>
+                    <button
+                      onClick={() => handleReviewExtension('reject')}
+                      disabled={submitting}
+                      className="btn btn-outline btn-sm"
+                      style={{ color: '#dc2626', borderColor: '#fca5a5' }}
+                    >
+                      <XCircle size={15} />
+                      Reject Extension
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="form-group">
                 <label className="form-label">
                   Manager Verification Notes / Decision Reason

@@ -4,11 +4,12 @@ import { useReservations } from '../context/ReservationContext.jsx';
 import { api } from '../services/api.js';
 import FileUpload from '../components/FileUpload.jsx';
 import SignaturePad from '../components/SignaturePad.jsx';
-import { ID_TYPES, formatDatePass } from '../utils/constants.js';
+import { ID_TYPES, DEFAULT_FLATS, formatDatePass } from '../utils/constants.js';
+import { extractAirbnbBookingDetails, extractSignatureFromDocument } from '../utils/documentParser.js';
 import confetti from 'canvas-confetti';
 import { 
   User, Calendar, ShieldCheck, PenTool, CheckCircle, ArrowRight, 
-  ArrowLeft, Check, Building, Clock
+  ArrowLeft, Check, Building, Clock, Loader2, Sparkles
 } from 'lucide-react';
 
 export default function RegistrationPage() {
@@ -19,6 +20,8 @@ export default function RegistrationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [airbnbFlow, setAirbnbFlow] = useState(false);
+  const [isOcrScanning, setIsOcrScanning] = useState(false);
+  const [ocrSuccess, setOcrSuccess] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState(() => ({
@@ -73,8 +76,46 @@ export default function RegistrationPage() {
     handleChange('airbnbBooking', isAirbnb);
     setAirbnbFlow(isAirbnb);
     if (isAirbnb) {
-      // For Airbnb, set minimal required fields
       handleChange('guestCount', 1);
+    }
+  };
+
+  const handleAirbnbDocUpload = async ({ url, name, publicId, resourceType }) => {
+    handleChange('airbnbScreenshotUrl', url);
+    handleChange('airbnbScreenshotName', name);
+    handleChange('airbnbScreenshotPublicId', publicId || '');
+    handleChange('airbnbScreenshotResourceType', resourceType || '');
+
+    if (url) {
+      setIsOcrScanning(true);
+      setOcrSuccess(false);
+      try {
+        const [parsedDetails, signatureCrop] = await Promise.all([
+          extractAirbnbBookingDetails(url),
+          extractSignatureFromDocument(url)
+        ]);
+
+        if (parsedDetails.flat) {
+          handleChange('flat', parsedDetails.flat);
+        }
+        if (parsedDetails.guestName && !formData.guestName) {
+          handleChange('guestName', parsedDetails.guestName);
+        }
+        if (parsedDetails.checkInDate) {
+          handleChange('checkInDate', parsedDetails.checkInDate);
+        }
+        if (parsedDetails.checkOutDate) {
+          handleChange('checkOutDate', parsedDetails.checkOutDate);
+        }
+        if (signatureCrop) {
+          handleChange('signatureUrl', signatureCrop);
+        }
+        setOcrSuccess(true);
+      } catch (err) {
+        console.warn('Airbnb document extraction error:', err);
+      } finally {
+        setIsOcrScanning(false);
+      }
     }
   };
 
@@ -158,7 +199,7 @@ export default function RegistrationPage() {
 
     setSubmitting(true);
     try {
-      // For Airbnb, send minimal data - backend will process document
+      // For Airbnb, send parsed/typed flat and signature
       const submissionData = airbnbFlow ? {
         guestName: formData.guestName,
         airbnbBooking: true,
@@ -169,12 +210,14 @@ export default function RegistrationPage() {
         guestCount: 1,
         phone: formData.phone || '',
         email: formData.email || '',
-        flat: 'Airbnb Booking',
-        checkInDate: new Date().toISOString().slice(0, 10),
-        checkOutDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+        flat: formData.flat || 'Azalea A1',
+        checkInDate: formData.checkInDate || new Date().toISOString().slice(0, 10),
+        checkOutDate: formData.checkOutDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+        checkInTime: formData.checkInTime || '14:00',
+        checkOutTime: formData.checkOutTime || '11:00',
         idType: 'Airbnb Verified',
         idNumber: 'Airbnb Verified',
-        signatureUrl: '',
+        signatureUrl: formData.signatureUrl || '',
         confirmedAccuracy: true
       } : formData;
 
@@ -378,25 +421,82 @@ export default function RegistrationPage() {
                         publicId={formData.airbnbScreenshotPublicId}
                         resourceType={formData.airbnbScreenshotResourceType}
                         kind="booking"
-                        onChange={({ url, name, publicId, resourceType }) => {
-                          handleChange('airbnbScreenshotUrl', url);
-                          handleChange('airbnbScreenshotName', name);
-                          handleChange('airbnbScreenshotPublicId', publicId || '');
-                          handleChange('airbnbScreenshotResourceType', resourceType || '');
-                        }}
+                        onChange={handleAirbnbDocUpload}
                         required={true}
                         accept="image/*"
                       />
                       {errors.airbnbScreenshotUrl && <span className="form-error" style={{ display: 'block', marginTop: '0.5rem' }}>{errors.airbnbScreenshotUrl}</span>}
                       
-                      {formData.airbnbScreenshotUrl && (
-                        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--radius-md)' }}>
-                          <p style={{ fontSize: '0.875rem', color: '#166534', marginBottom: '0.5rem' }}>
-                            <strong>Airbnb document uploaded successfully!</strong>
-                          </p>
-                          <p style={{ fontSize: '0.8rem', color: '#15803d' }}>
-                            Click "Continue" to generate your pass from the Airbnb booking information.
-                          </p>
+                      {isOcrScanning && (
+                        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <Loader2 size={20} className="animate-spin" style={{ color: '#0284c7' }} />
+                          <div>
+                            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0369a1', margin: 0 }}>
+                              Scanning document...
+                            </p>
+                            <p style={{ fontSize: '0.8rem', color: '#0284c7', margin: 0 }}>
+                              Automatically extracting apartment number and flat owner signature.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {formData.airbnbScreenshotUrl && !isOcrScanning && (
+                        <div style={{ marginTop: '1.25rem', padding: '1.25rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--radius-md)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                            <Sparkles size={18} style={{ color: '#16a34a' }} />
+                            <strong style={{ fontSize: '0.9rem', color: '#166534' }}>
+                              Airbnb Document Details Extracted
+                            </strong>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginTop: '0.75rem' }}>
+                            {/* Extracted/Editable Flat Number */}
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
+                                Apartment / Flat Name <span className="required">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                className="form-input"
+                                style={{ backgroundColor: '#ffffff', borderColor: '#86efac' }}
+                                placeholder="e.g. Azalea D6"
+                                value={formData.flat}
+                                onChange={(e) => handleChange('flat', e.target.value)}
+                              />
+                              <span style={{ fontSize: '0.75rem', color: '#15803d' }}>
+                                Auto-extracted from document (type to adjust if needed)
+                              </span>
+                            </div>
+
+                            {/* Extracted Flat Owner Signature Preview */}
+                            <div>
+                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
+                                Flat Owner's Signature
+                              </label>
+                              <div style={{
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #86efac',
+                                borderRadius: 'var(--radius-sm)',
+                                padding: '0.5rem',
+                                minHeight: '44px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                {formData.signatureUrl ? (
+                                  <img src={formData.signatureUrl} alt="Extracted Owner Signature" style={{ maxHeight: '38px', objectFit: 'contain' }} />
+                                ) : (
+                                  <span style={{ fontSize: '0.75rem', color: '#65a30d', fontStyle: 'italic' }}>
+                                    Digital Verification Applied
+                                  </span>
+                                )}
+                              </div>
+                              <span style={{ fontSize: '0.75rem', color: '#15803d' }}>
+                                Extracted from document for official pass
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -422,7 +522,7 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                {/* Flat / Apartment Name - Manual Entry */}
+                {/* Flat / Apartment Name - Manual Entry (Typing Only) */}
                 <div className="form-group">
                   <label className="form-label">
                     Flat / Apartment Name <span className="required">*</span>
@@ -430,7 +530,7 @@ export default function RegistrationPage() {
                   <input
                     type="text"
                     className={`form-input ${errors.flat ? 'error' : ''}`}
-                    placeholder="e.g. Azalea C1"
+                    placeholder="e.g. Azalea D6"
                     value={formData.flat}
                     onChange={(e) => handleChange('flat', e.target.value)}
                   />
