@@ -442,11 +442,11 @@ export default function RegistrationPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                             <Sparkles size={18} style={{ color: '#16a34a' }} />
                             <strong style={{ fontSize: '0.9rem', color: '#166534' }}>
-                              Apartment Name Extracted
+                              Details Extracted from Airbnb Document
                             </strong>
                           </div>
 
-                          <div className="form-group" style={{ marginBottom: 0 }}>
+                          <div className="form-group" style={{ marginBottom: '1rem' }}>
                             <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
                               Apartment / Flat Name <span className="required">*</span>
                             </label>
@@ -461,6 +461,39 @@ export default function RegistrationPage() {
                             <span style={{ fontSize: '0.75rem', color: '#15803d' }}>
                               Auto-extracted from document (type to adjust if needed)
                             </span>
+                          </div>
+
+                          {/* Extracted Stay Dates from Document */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '1rem', marginTop: '0.75rem' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
+                                Check-in Date (on Document) <span className="required">*</span>
+                              </label>
+                              <input
+                                type="date"
+                                className="form-input"
+                                style={{ backgroundColor: '#ffffff', borderColor: '#86efac' }}
+                                value={formData.checkInDate}
+                                onChange={(e) => handleChange('checkInDate', e.target.value)}
+                              />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
+                                Check-out Date (on Document) <span className="required">*</span>
+                              </label>
+                              <input
+                                type="date"
+                                className="form-input"
+                                style={{ backgroundColor: '#ffffff', borderColor: '#86efac' }}
+                                value={formData.checkOutDate}
+                                onChange={(e) => handleChange('checkOutDate', e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div style={{ marginTop: '0.75rem', fontSize: '0.775rem', color: '#166534', fontWeight: 600 }}>
+                            📅 Dates verified from uploaded document will be printed on your official Gate Pass ({formatDatePass(formData.checkInDate)} – {formatDatePass(formData.checkOutDate)}).
                           </div>
                         </div>
                       )}

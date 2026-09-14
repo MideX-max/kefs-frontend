@@ -21,6 +21,8 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
     checkOutTime = "11:00",
     signatureUrl,
     managerSignatureUrl,
+    airbnbBooking,
+    airbnbScreenshotUrl,
     status = "Approved"
   } = reservation;
 
@@ -89,6 +91,23 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
         }}>
           The details of your reservation for access into the Estate:
         </p>
+        {(airbnbBooking || airbnbScreenshotUrl) && (
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            marginTop: '0.6rem',
+            padding: '0.25rem 0.75rem',
+            backgroundColor: '#ff5a5f15',
+            border: '1px solid #ff5a5f40',
+            borderRadius: '20px',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            color: '#d93900'
+          }}>
+            <span style={{ fontSize: '0.85rem' }}>🏠</span> Verified Airbnb Booking Document Attached
+          </div>
+        )}
       </div>
 
       {/* 2. Dotted Field Lines matching physical reference */}
