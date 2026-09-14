@@ -233,14 +233,18 @@ export const api = {
   },
 
   // `kind` routes the file into the right Cloudinary folder.
-  async uploadFile(file, kind = 'id-document') {
+  async uploadFile(file, kind = 'id-document', customToken = null) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('kind', kind);
 
+    const adminToken = localStorage.getItem('kas_token');
+    const guestToken = sessionStorage.getItem('kas_guest_access_token');
+    const activeToken = customToken || adminToken || guestToken;
+
     const data = await requestJson('/upload', {
       method: 'POST',
-      headers: guestAuthHeaders(),
+      headers: authHeaders(activeToken),
       body: formData
     });
 
@@ -251,14 +255,18 @@ export const api = {
   },
 
   // Removes an upload that was abandoned or replaced before it was saved.
-  async deleteUpload(publicId, resourceType = 'image', token = '') {
+  async deleteUpload(publicId, resourceType = 'image', customToken = '') {
     if (!publicId) return null;
+
+    const adminToken = localStorage.getItem('kas_token');
+    const guestToken = sessionStorage.getItem('kas_guest_access_token');
+    const activeToken = customToken || adminToken || guestToken;
 
     return requestJson('/upload', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        ...authHeaders(token)
+        ...authHeaders(activeToken)
       },
       body: JSON.stringify({ publicId, resourceType })
     });

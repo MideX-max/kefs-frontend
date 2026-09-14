@@ -6,6 +6,7 @@ import Logo from '../components/Logo.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ReservationModal from '../components/ReservationModal.jsx';
 import SignaturePad from '../components/SignaturePad.jsx';
+import FileUpload from '../components/FileUpload.jsx';
 import { formatDatePass } from '../utils/constants.js';
 import { 
   LayoutDashboard, Users, Calendar, AlertTriangle, 
@@ -39,13 +40,16 @@ export default function AdminDashboard() {
   const [flatBlockFilter, setFlatBlockFilter] = useState('All');
 
   // Settings State
+  const [managerSigMethod, setManagerSigMethod] = useState('draw');
   const [profileForm, setProfileForm] = useState(() => ({
     name: user?.name || 'Engr. David Okon',
     role: user?.role || 'Chief Facility Manager',
     email: user?.email || 'manager@keffiapartments.ng',
     phone: user?.phone || '+234 803 000 1122',
     estateName: user?.estateName || 'KEFFI APARTMENT SUITES',
-    defaultSignature: defaultSignature
+    defaultSignature: defaultSignature || '',
+    defaultSignaturePublicId: user?.defaultSignaturePublicId || '',
+    defaultSignatureResourceType: user?.defaultSignatureResourceType || ''
   }));
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -944,17 +948,92 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  {/* Authorized Default Signature Pad */}
+                  {/* Authorized Manager Signature Section (Draw or Upload) */}
                   <div style={{ marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)' }}>
-                    <SignaturePad
-                      value={profileForm.defaultSignature}
-                      onChange={(sig) => setProfileForm(p => ({ ...p, defaultSignature: sig }))}
-                      label="Facility Manager Authorized Signature"
-                      required={false}
-                    />
-                    <span className="form-hint" style={{ marginTop: '-0.5rem', display: 'block', marginBottom: '1.5rem' }}>
-                      This signature is automatically rendered on the official Gate Pass upon approved registration.
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                      <ShieldCheck size={18} style={{ color: 'var(--brand-gold-dark)' }} />
+                      <strong style={{ fontSize: '0.95rem', color: 'var(--brand-black)' }}>
+                        Facility Manager Authorized Signature
+                      </strong>
+                    </div>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: '1.4' }}>
+                      Draw your signature or upload an image of your official signature. The saved signature is automatically applied to generated Gate Passes.
+                    </p>
+
+                    {/* Method Selector */}
+                    <div style={{ marginBottom: '1.25rem' }}>
+                      <div style={{ display: 'flex', gap: '1.5rem' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                          <input
+                            type="radio"
+                            name="managerSigMethod"
+                            checked={managerSigMethod === 'draw'}
+                            onChange={() => setManagerSigMethod('draw')}
+                            style={{ accentColor: 'var(--brand-black)' }}
+                          />
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Draw Signature</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                          <input
+                            type="radio"
+                            name="managerSigMethod"
+                            checked={managerSigMethod === 'upload'}
+                            onChange={() => setManagerSigMethod('upload')}
+                            style={{ accentColor: 'var(--brand-black)' }}
+                          />
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Upload Signature Image</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {managerSigMethod === 'draw' ? (
+                      <SignaturePad
+                        value={profileForm.defaultSignature}
+                        onChange={(sig) => setProfileForm(p => ({
+                          ...p,
+                          defaultSignature: sig,
+                          defaultSignaturePublicId: '',
+                          defaultSignatureResourceType: ''
+                        }))}
+                        label="Facility Manager Signature Pad"
+                        required={false}
+                      />
+                    ) : (
+                      <FileUpload
+                        label="Upload Manager Signature Image"
+                        hint="Upload an image file of your signature (PNG, JPG up to 10MB)"
+                        value={profileForm.defaultSignature}
+                        publicId={profileForm.defaultSignaturePublicId}
+                        resourceType={profileForm.defaultSignatureResourceType}
+                        kind="manager-signature"
+                        onChange={({ url, publicId, resourceType }) => {
+                          setProfileForm(p => ({
+                            ...p,
+                            defaultSignature: url,
+                            defaultSignaturePublicId: publicId || '',
+                            defaultSignatureResourceType: resourceType || ''
+                          }));
+                        }}
+                        required={false}
+                        accept="image/*"
+                      />
+                    )}
+
+                    {/* Saved Signature Preview */}
+                    {profileForm.defaultSignature && (
+                      <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f9fafb', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--brand-gold-dark)', display: 'block', marginBottom: '0.5rem' }}>
+                          CURRENT SAVED SIGNATURE PREVIEW
+                        </span>
+                        <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff', border: '1px solid var(--border-light)', borderRadius: '4px' }}>
+                          <img
+                            src={profileForm.defaultSignature}
+                            alt="Manager Signature Preview"
+                            style={{ maxHeight: '60px', maxWidth: '100%', objectFit: 'contain' }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>

@@ -164,9 +164,9 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
               {signatureUrl ? (
                 <img
                   src={signatureUrl}
-                  alt="Guest Signature"
+                  alt="Representative Signature"
                   className="pass-sig-img"
-                style={{ maxHeight: '60px', objectFit: 'contain' }}
+                  style={{ maxHeight: '60px', objectFit: 'contain' }}
                 />
               ) : (
                 <span style={{ fontSize: '0.85rem', color: '#888888', fontStyle: 'italic' }}>

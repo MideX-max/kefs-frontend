@@ -1,60 +1,127 @@
 import { useRef, useState, useEffect } from 'react';
-import { RotateCcw, PenTool, Check, ShieldCheck } from 'lucide-react';
-import { DEFAULT_MANAGER_SIG } from '../utils/constants.js';
+import { RotateCcw, PenTool } from 'lucide-react';
 
 export default function SignaturePad({ value, onChange, label = "Digital Signature", required = true }) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
-  const isUsingDefault = value === DEFAULT_MANAGER_SIG;
   const hasSignature = Boolean(value);
 
-  // Initialize and synchronize canvas DOM
+  const lastDrawnUrlRef = useRef('');
+
+  // 1. Initialize canvas dimensions once on mount
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
-    // Scale for high-DPI screens
+
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
     const rect = canvas.getBoundingClientRect();
-    
-    canvas.width = (rect.width || 450) * ratio;
+    const width = rect.width || 450;
+
+    canvas.width = width * ratio;
     canvas.height = 140 * ratio;
+
+    const ctx = canvas.getContext('2d');
     ctx.scale(ratio, ratio);
-    
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = '#111111';
     ctx.lineWidth = 2.2;
+  }, []);
+
+  // 2. Load value from props if changed externally (and not matching lastDrawnUrlRef)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Skip if value matches what was just drawn locally
+    if (value === lastDrawnUrlRef.current) return;
+
+    const ctx = canvas.getContext('2d');
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width || 450;
 
     if (value && (value.startsWith('data:') || value.startsWith('http'))) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 20, 15, (rect.width || 450) - 40, 110);
+        ctx.clearRect(0, 0, width, 140);
+        ctx.drawImage(img, 20, 15, width - 40, 110);
       };
       img.src = value;
+      lastDrawnUrlRef.current = value;
     } else if (!value) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, width, 140);
+      lastDrawnUrlRef.current = '';
     }
   }, [value]);
+
+  // Bind native non-passive touch listeners to eliminate passive listener warnings
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let drawing = false;
+
+    const handleTouchStart = (e) => {
+      if (e.cancelable) e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      const ctx = canvas.getContext('2d');
+      ctx.beginPath();
+      ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+      drawing = true;
+      setIsDrawing(true);
+    };
+
+    const handleTouchMove = (e) => {
+      if (!drawing) return;
+      if (e.cancelable) e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      const ctx = canvas.getContext('2d');
+      ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+      ctx.stroke();
+    };
+
+    const handleTouchEnd = (e) => {
+      if (!drawing) return;
+      if (e.cancelable) e.preventDefault();
+      drawing = false;
+      setIsDrawing(false);
+      const dataUrl = canvas.toDataURL('image/png');
+      lastDrawnUrlRef.current = dataUrl;
+      if (onChange) {
+        onChange(dataUrl);
+      }
+    };
+
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [onChange]);
 
   const getCoordinates = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
     return {
       x: clientX - rect.left,
       y: clientY - rect.top
     };
   };
 
-  const startDrawing = (e) => {
-    e.preventDefault();
+  const startMouseDrawing = (e) => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const { x, y } = getCoordinates(e);
     
@@ -63,10 +130,10 @@ export default function SignaturePad({ value, onChange, label = "Digital Signatu
     setIsDrawing(true);
   };
 
-  const draw = (e) => {
+  const mouseDraw = (e) => {
     if (!isDrawing) return;
-    e.preventDefault();
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const { x, y } = getCoordinates(e);
 
@@ -74,11 +141,12 @@ export default function SignaturePad({ value, onChange, label = "Digital Signatu
     ctx.stroke();
   };
 
-  const stopDrawing = () => {
+  const stopMouseDrawing = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
     const canvas = canvasRef.current;
     const dataUrl = canvas.toDataURL('image/png');
+    lastDrawnUrlRef.current = dataUrl;
     if (onChange) {
       onChange(dataUrl);
     }
@@ -94,12 +162,6 @@ export default function SignaturePad({ value, onChange, label = "Digital Signatu
     }
   };
 
-  const handleUseDefault = () => {
-    if (onChange) {
-      onChange(DEFAULT_MANAGER_SIG);
-    }
-  };
-
   return (
     <div className="form-group" style={{ marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
@@ -111,15 +173,6 @@ export default function SignaturePad({ value, onChange, label = "Digital Signatu
           </span>
         </label>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            type="button"
-            onClick={handleUseDefault}
-            className="btn btn-outline-gold btn-sm"
-            style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-          >
-            <ShieldCheck size={13} />
-            Use Authorized Default
-          </button>
           <button
             type="button"
             onClick={handleClear}
@@ -143,13 +196,10 @@ export default function SignaturePad({ value, onChange, label = "Digital Signatu
         <canvas
           ref={canvasRef}
           style={{ width: '100%', height: '140px', display: 'block', touchAction: 'none', cursor: 'crosshair' }}
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={stopDrawing}
+          onMouseDown={startMouseDrawing}
+          onMouseMove={mouseDraw}
+          onMouseUp={stopMouseDrawing}
+          onMouseLeave={stopMouseDrawing}
         />
 
         {/* Guide line */}
@@ -176,30 +226,9 @@ export default function SignaturePad({ value, onChange, label = "Digital Signatu
             <span>Sign here using finger or mouse</span>
           </div>
         )}
-
-        {isUsingDefault && (
-          <div style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            backgroundColor: 'var(--brand-gold-light)',
-            color: 'var(--brand-gold-dark)',
-            border: '1px solid var(--brand-gold-border)',
-            padding: '2px 8px',
-            borderRadius: '4px',
-            fontSize: '0.7rem',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            <Check size={12} />
-            Authorized Signature Applied
-          </div>
-        )}
       </div>
       <span className="form-hint">
-        Sign above or apply default authorized management signature.
+        Sign above using your finger or mouse cursor.
       </span>
     </div>
   );

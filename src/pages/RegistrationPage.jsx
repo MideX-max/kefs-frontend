@@ -90,10 +90,7 @@ export default function RegistrationPage() {
       setIsOcrScanning(true);
       setOcrSuccess(false);
       try {
-        const [parsedDetails, signatureCrop] = await Promise.all([
-          extractAirbnbBookingDetails(url),
-          extractSignatureFromDocument(url)
-        ]);
+        const parsedDetails = await extractAirbnbBookingDetails(url);
 
         if (parsedDetails.flat) {
           handleChange('flat', parsedDetails.flat);
@@ -106,9 +103,6 @@ export default function RegistrationPage() {
         }
         if (parsedDetails.checkOutDate) {
           handleChange('checkOutDate', parsedDetails.checkOutDate);
-        }
-        if (signatureCrop) {
-          handleChange('signatureUrl', signatureCrop);
         }
         setOcrSuccess(true);
       } catch (err) {
@@ -217,7 +211,9 @@ export default function RegistrationPage() {
         checkOutTime: formData.checkOutTime || '11:00',
         idType: 'Airbnb Verified',
         idNumber: 'Airbnb Verified',
-        signatureUrl: formData.signatureUrl || '',
+        signatureUrl: formData.signatureUrl || (formData.signatureMethod === 'upload' ? formData.signatureUploadUrl : ''),
+        signaturePublicId: formData.signaturePublicId || '',
+        signatureResourceType: formData.signatureResourceType || '',
         confirmedAccuracy: true
       } : formData;
 
@@ -435,7 +431,7 @@ export default function RegistrationPage() {
                               Scanning document...
                             </p>
                             <p style={{ fontSize: '0.8rem', color: '#0284c7', margin: 0 }}>
-                              Automatically extracting apartment number and flat owner signature.
+                              Automatically extracting apartment name from document.
                             </p>
                           </div>
                         </div>
@@ -446,59 +442,99 @@ export default function RegistrationPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                             <Sparkles size={18} style={{ color: '#16a34a' }} />
                             <strong style={{ fontSize: '0.9rem', color: '#166534' }}>
-                              Airbnb Document Details Extracted
+                              Apartment Name Extracted
                             </strong>
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginTop: '0.75rem' }}>
-                            {/* Extracted/Editable Flat Number */}
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
-                                Apartment / Flat Name <span className="required">*</span>
-                              </label>
-                              <input
-                                type="text"
-                                className="form-input"
-                                style={{ backgroundColor: '#ffffff', borderColor: '#86efac' }}
-                                placeholder="e.g. Azalea D6"
-                                value={formData.flat}
-                                onChange={(e) => handleChange('flat', e.target.value)}
-                              />
-                              <span style={{ fontSize: '0.75rem', color: '#15803d' }}>
-                                Auto-extracted from document (type to adjust if needed)
-                              </span>
-                            </div>
-
-                            {/* Extracted Flat Owner Signature Preview */}
-                            <div>
-                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
-                                Flat Owner's Signature
-                              </label>
-                              <div style={{
-                                backgroundColor: '#ffffff',
-                                border: '1px solid #86efac',
-                                borderRadius: 'var(--radius-sm)',
-                                padding: '0.5rem',
-                                minHeight: '44px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}>
-                                {formData.signatureUrl ? (
-                                  <img src={formData.signatureUrl} alt="Extracted Owner Signature" style={{ maxHeight: '38px', objectFit: 'contain' }} />
-                                ) : (
-                                  <span style={{ fontSize: '0.75rem', color: '#65a30d', fontStyle: 'italic' }}>
-                                    Digital Verification Applied
-                                  </span>
-                                )}
-                              </div>
-                              <span style={{ fontSize: '0.75rem', color: '#15803d' }}>
-                                Extracted from document for official pass
-                              </span>
-                            </div>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
+                              Apartment / Flat Name <span className="required">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className="form-input"
+                              style={{ backgroundColor: '#ffffff', borderColor: '#86efac' }}
+                              placeholder="e.g. Azalea D6"
+                              value={formData.flat}
+                              onChange={(e) => handleChange('flat', e.target.value)}
+                            />
+                            <span style={{ fontSize: '0.75rem', color: '#15803d' }}>
+                              Auto-extracted from document (type to adjust if needed)
+                            </span>
                           </div>
                         </div>
                       )}
+
+                      {/* Airbnb Digital Signature Capture Section */}
+                      <div style={{ marginTop: '1.25rem', padding: '1.25rem', backgroundColor: '#ffffff', border: '1px solid #bae6fd', borderRadius: 'var(--radius-md)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                          <PenTool size={18} style={{ color: 'var(--brand-gold-dark)' }} />
+                          <strong style={{ fontSize: '0.9rem', color: 'var(--brand-black)' }}>
+                            Digital Signature Capture
+                          </strong>
+                        </div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: '1.4' }}>
+                          Sign below or upload a signature image to endorse your Airbnb access pass.
+                        </p>
+
+                        {/* Signature Method Selection */}
+                        <div style={{ marginBottom: '1rem' }}>
+                          <div style={{ display: 'flex', gap: '1rem' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                              <input
+                                type="radio"
+                                name="airbnbSignatureMethod"
+                                checked={formData.signatureMethod === 'draw'}
+                                onChange={() => handleChange('signatureMethod', 'draw')}
+                                style={{ accentColor: 'var(--brand-black)' }}
+                              />
+                              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Draw Signature</span>
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                              <input
+                                type="radio"
+                                name="airbnbSignatureMethod"
+                                checked={formData.signatureMethod === 'upload'}
+                                onChange={() => handleChange('signatureMethod', 'upload')}
+                                style={{ accentColor: 'var(--brand-black)' }}
+                              />
+                              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Upload Signature Image</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {formData.signatureMethod === 'draw' ? (
+                          <SignaturePad
+                            value={formData.signatureUrl}
+                            onChange={(sig) => {
+                              handleChange('signatureUrl', sig);
+                              handleChange('signaturePublicId', '');
+                              handleChange('signatureResourceType', '');
+                            }}
+                            label="Guest Digital Signature"
+                            required={false}
+                          />
+                        ) : (
+                          <FileUpload
+                            label="Upload Signature Image"
+                            hint="Upload a clear image of your signature"
+                            value={formData.signatureUploadUrl}
+                            fileName={formData.signatureUploadName}
+                            publicId={formData.signaturePublicId}
+                            resourceType={formData.signatureResourceType}
+                            kind="signature"
+                            onChange={({ url, name, publicId, resourceType }) => {
+                              handleChange('signatureUploadUrl', url);
+                              handleChange('signatureUploadName', name);
+                              handleChange('signatureUrl', url);
+                              handleChange('signaturePublicId', publicId || '');
+                              handleChange('signatureResourceType', resourceType || '');
+                            }}
+                            required={false}
+                            accept="image/*"
+                          />
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
