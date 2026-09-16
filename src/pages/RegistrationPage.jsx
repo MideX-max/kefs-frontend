@@ -122,8 +122,15 @@ export default function RegistrationPage() {
       if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
         newErrors.email = 'Please enter a valid email address.';
       }
-      if (formData.airbnbBooking && !formData.airbnbScreenshotUrl) {
-        newErrors.airbnbScreenshotUrl = 'Airbnb booking screenshot is required when booking through Airbnb.';
+      if (formData.airbnbBooking) {
+        if (!formData.checkInDate) newErrors.checkInDate = 'Check-in date is required.';
+        if (!formData.checkOutDate) newErrors.checkOutDate = 'Check-out date is required.';
+        if (formData.checkInDate && formData.checkOutDate && new Date(formData.checkOutDate) <= new Date(formData.checkInDate)) {
+          newErrors.checkOutDate = 'Check-out date must be after check-in date.';
+        }
+        if (!formData.airbnbScreenshotUrl) {
+          newErrors.airbnbScreenshotUrl = 'Airbnb booking screenshot is required when booking through Airbnb.';
+        }
       }
     }
 
@@ -409,6 +416,74 @@ export default function RegistrationPage() {
                   
                   {formData.airbnbBooking && (
                     <div style={{ marginTop: '1rem' }}>
+                      <p style={{ fontSize: '0.8rem', color: '#0369a1', marginBottom: '1rem', lineHeight: '1.4' }}>
+                        Please enter your stay dates and times below, then upload your Airbnb booking document.
+                      </p>
+
+                      {/* Date & Time Selection BEFORE Document Upload */}
+                      <div style={{ padding: '1.25rem', backgroundColor: '#ffffff', border: '1px solid #bae6fd', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem' }}>
+                        <strong style={{ fontSize: '0.875rem', color: '#0369a1', display: 'block', marginBottom: '0.75rem' }}>
+                          📅 Step 1: Select Stay Dates &amp; Expected Arrival/Departure Times
+                        </strong>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontSize: '0.825rem' }}>
+                              Check-in Date <span className="required">*</span>
+                            </label>
+                            <input
+                              type="date"
+                              className={`form-input ${errors.checkInDate ? 'error' : ''}`}
+                              value={formData.checkInDate}
+                              onChange={(e) => handleChange('checkInDate', e.target.value)}
+                            />
+                            {errors.checkInDate && <span className="form-error">{errors.checkInDate}</span>}
+                          </div>
+
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontSize: '0.825rem' }}>
+                              Check-out Date <span className="required">*</span>
+                            </label>
+                            <input
+                              type="date"
+                              className={`form-input ${errors.checkOutDate ? 'error' : ''}`}
+                              value={formData.checkOutDate}
+                              onChange={(e) => handleChange('checkOutDate', e.target.value)}
+                            />
+                            {errors.checkOutDate && <span className="form-error">{errors.checkOutDate}</span>}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '1rem' }}>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontSize: '0.825rem' }}>
+                              Check-in Time
+                            </label>
+                            <input
+                              type="time"
+                              className="form-input"
+                              value={formData.checkInTime}
+                              onChange={(e) => handleChange('checkInTime', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontSize: '0.825rem' }}>
+                              Check-out Time
+                            </label>
+                            <input
+                              type="time"
+                              className="form-input"
+                              value={formData.checkOutTime}
+                              onChange={(e) => handleChange('checkOutTime', e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <strong style={{ fontSize: '0.875rem', color: '#0369a1', display: 'block', marginBottom: '0.5rem' }}>
+                        📄 Step 2: Upload Airbnb Booking Document
+                      </strong>
                       <FileUpload
                         label="Upload Airbnb Booking Screenshot"
                         hint="Upload a screenshot of your Airbnb booking confirmation page (compulsory)"
@@ -446,7 +521,7 @@ export default function RegistrationPage() {
                             </strong>
                           </div>
 
-                          <div className="form-group" style={{ marginBottom: '1rem' }}>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
                             <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
                               Apartment / Flat Name <span className="required">*</span>
                             </label>
@@ -463,38 +538,11 @@ export default function RegistrationPage() {
                             </span>
                           </div>
 
-                          {/* Extracted Stay Dates from Document */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '1rem', marginTop: '0.75rem' }}>
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
-                                Check-in Date (on Document) <span className="required">*</span>
-                              </label>
-                              <input
-                                type="date"
-                                className="form-input"
-                                style={{ backgroundColor: '#ffffff', borderColor: '#86efac' }}
-                                value={formData.checkInDate}
-                                onChange={(e) => handleChange('checkInDate', e.target.value)}
-                              />
+                          {formData.checkInDate && formData.checkOutDate && (
+                            <div style={{ marginTop: '0.75rem', fontSize: '0.775rem', color: '#166534', fontWeight: 600 }}>
+                              📅 Confirmed stay dates on Gate Pass: ({formatDatePass(formData.checkInDate)} – {formatDatePass(formData.checkOutDate)}).
                             </div>
-
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                              <label className="form-label" style={{ fontSize: '0.825rem', color: '#14532d' }}>
-                                Check-out Date (on Document) <span className="required">*</span>
-                              </label>
-                              <input
-                                type="date"
-                                className="form-input"
-                                style={{ backgroundColor: '#ffffff', borderColor: '#86efac' }}
-                                value={formData.checkOutDate}
-                                onChange={(e) => handleChange('checkOutDate', e.target.value)}
-                              />
-                            </div>
-                          </div>
-                          
-                          <div style={{ marginTop: '0.75rem', fontSize: '0.775rem', color: '#166534', fontWeight: 600 }}>
-                            📅 Dates verified from uploaded document will be printed on your official Gate Pass ({formatDatePass(formData.checkInDate)} – {formatDatePass(formData.checkOutDate)}).
-                          </div>
+                          )}
                         </div>
                       )}
 
