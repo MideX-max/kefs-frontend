@@ -354,7 +354,7 @@ export default function RegistrationPage() {
                         <input
                           type="tel"
                           className={`form-input ${errors.phone ? 'error' : ''}`}
-                          placeholder="+234 803 123 4567"
+                          placeholder="+234 704 362 3113"
                           value={formData.phone}
                           onChange={(e) => handleChange('phone', e.target.value)}
                         />

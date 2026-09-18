@@ -345,7 +345,7 @@ export default function PassPage() {
                 <strong>Validity:</strong> Pass is active strictly from <strong>{formatDatePass(reservation.checkInDate)} ({reservation.checkInTime || '14:00'})</strong> to <strong>{formatDatePass(reservation.checkOutDate)} ({reservation.checkOutTime || '11:00'})</strong>.
               </li>
               <li>
-                <strong>Support:</strong> If you experience any delay, contact the Facility Manager at <strong>+234 800 533 3442</strong>.
+                <strong>Support:</strong> If you experience any delay, contact the Facility Manager at <strong>+234 704 362 3113</strong>.
               </li>
             </ul>
 

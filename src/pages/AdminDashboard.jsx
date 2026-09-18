@@ -45,7 +45,7 @@ export default function AdminDashboard() {
     name: user?.name || 'Engr. David Okon',
     role: user?.role || 'Chief Facility Manager',
     email: user?.email || 'manager@keffiapartments.ng',
-    phone: user?.phone || '+234 803 000 1122',
+    phone: user?.phone || '+234 704 362 3113',
     estateName: user?.estateName || 'KEFFI APARTMENT SUITES',
     defaultSignature: defaultSignature || '',
     defaultSignaturePublicId: user?.defaultSignaturePublicId || '',
