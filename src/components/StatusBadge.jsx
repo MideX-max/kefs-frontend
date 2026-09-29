@@ -31,6 +31,15 @@ export default function StatusBadge({ status, size = 'md' }) {
           Upcoming
         </span>
       );
+    case 'flagged':
+    case 'id flagged':
+    case 'flagged id':
+      return (
+        <span className={`badge badge-pending ${sizeClasses[size]}`} style={{ backgroundColor: '#fffbeb', borderColor: '#fde68a', color: '#b45309' }}>
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+          ID Flagged
+        </span>
+      );
     case 'pending review':
     case 'pending':
     case 'requires review':

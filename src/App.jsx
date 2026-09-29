@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ReservationProvider } from './context/ReservationContext.jsx';
+import { NotificationProvider } from './context/NotificationContext.jsx';
 
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
@@ -56,7 +57,9 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ReservationProvider>
-          <AppLayout />
+          <NotificationProvider>
+            <AppLayout />
+          </NotificationProvider>
         </ReservationProvider>
       </AuthProvider>
     </BrowserRouter>

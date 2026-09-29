@@ -156,6 +156,17 @@ export function ReservationProvider({ children }) {
     }
   };
 
+  const verifyId = async (id, { action, flagReason, notes }) => {
+    setLoading(true);
+    try {
+      const res = await api.verifyId(id, { action, flagReason, notes }, token);
+      await Promise.all([fetchReservations(), fetchFlats()]);
+      return res.reservation;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ReservationContext.Provider value={{
       reservations,
@@ -173,7 +184,8 @@ export function ReservationProvider({ children }) {
       updateFlat,
       getReservationById,
       extendStay,
-      reviewStayExtension
+      reviewStayExtension,
+      verifyId
     }}>
       {children}
     </ReservationContext.Provider>

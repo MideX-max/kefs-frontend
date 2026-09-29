@@ -270,5 +270,39 @@ export const api = {
       },
       body: JSON.stringify({ publicId, resourceType })
     });
+  },
+
+  async verifyId(id, { action, flagReason, notes }, token) {
+    const data = await requestJson(`/reservations/${encodeURIComponent(id)}/verify-id`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(token)
+      },
+      body: JSON.stringify({ action, flagReason, notes })
+    });
+
+    return {
+      ...data,
+      reservation: normalizeReservation(data.reservation)
+    };
+  },
+
+  async getNotifications(role = 'manager') {
+    return requestJson(`/notifications?role=${encodeURIComponent(role)}`);
+  },
+
+  async markNotificationRead(id) {
+    return requestJson(`/notifications/${encodeURIComponent(id)}/read`, {
+      method: 'PATCH'
+    });
+  },
+
+  async markAllNotificationsRead(role = 'manager') {
+    return requestJson('/notifications/read-all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role })
+    });
   }
 };

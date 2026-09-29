@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useNotifications } from '../context/NotificationContext.jsx';
 import Logo from './Logo.jsx';
-import { Menu, X, Shield, UserPlus, LayoutDashboard, LogOut } from 'lucide-react';
+import NotificationPanel from './NotificationPanel.jsx';
+import { Menu, X, Shield, UserPlus, LayoutDashboard, LogOut, Bell } from 'lucide-react';
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notifPanelOpen, setNotifPanelOpen] = useState(false);
 
   const isActive = (path) => {
     if (path === '/guest-access') {
@@ -21,6 +25,7 @@ export default function Navbar() {
     logout();
     navigate('/');
     setMobileMenuOpen(false);
+    setNotifPanelOpen(false);
   };
 
   return (
@@ -28,7 +33,7 @@ export default function Navbar() {
       <div className="container">
         <div className="kas-header-inner">
           {/* Logo */}
-          <Link to="/" className="kas-logo-link" onClick={() => setMobileMenuOpen(false)}>
+          <Link to="/" className="kas-logo-link" onClick={() => { setMobileMenuOpen(false); setNotifPanelOpen(false); }}>
             <Logo height={58} />
           </Link>
 
@@ -43,6 +48,29 @@ export default function Navbar() {
             <Link to="/status" className={`kas-nav-link ${isActive('/status') ? 'active' : ''}`}>
               Check Reservation
             </Link>
+
+            {/* Real-time Notification Bell */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setNotifPanelOpen(!notifPanelOpen)}
+                className="kas-nav-notif-btn"
+                title="Notifications"
+                aria-label="Toggle notifications"
+              >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                  <span className="kas-nav-notif-badge">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {notifPanelOpen && (
+                <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 12px)', zIndex: 100 }}>
+                  <NotificationPanel onClose={() => setNotifPanelOpen(false)} />
+                </div>
+              )}
+            </div>
 
             {isAuthenticated ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -73,15 +101,59 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="mobile-nav-toggle"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
-          </button>
+          {/* Mobile Actions Right */}
+          <div style={{ display: 'none', alignItems: 'center', gap: '0.75rem' }} className="mobile-nav-right">
+            <button
+              onClick={() => setNotifPanelOpen(!notifPanelOpen)}
+              className="kas-nav-notif-btn"
+              title="Notifications"
+            >
+              <Bell size={22} />
+              {unreadCount > 0 && (
+                <span className="kas-nav-notif-badge">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+            <button
+              className="mobile-nav-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            </button>
+          </div>
+
+          {/* Mobile Menu Button for standard responsive display */}
+          <div className="mobile-only-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              onClick={() => setNotifPanelOpen(!notifPanelOpen)}
+              className="kas-nav-notif-btn mobile-notif-trigger"
+              aria-label="Notifications"
+            >
+              <Bell size={22} />
+              {unreadCount > 0 && (
+                <span className="kas-nav-notif-badge">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+            <button
+              className="mobile-nav-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            </button>
+          </div>
         </div>
+
+        {/* Notification Panel on Mobile */}
+        {notifPanelOpen && (
+          <div className="kas-mobile-notif-dropdown">
+            <NotificationPanel onClose={() => setNotifPanelOpen(false)} />
+          </div>
+        )}
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (

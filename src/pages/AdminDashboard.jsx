@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   const { user, logout, isAuthenticated, updateProfile, defaultSignature } = useAuth();
   const { 
     reservations, flats, stats, loading, filters, setFilters, 
-    fetchReservations, updateStatus, addFlat, reviewStayExtension
+    fetchReservations, updateStatus, addFlat, reviewStayExtension, verifyId
   } = useReservations();
 
   const [activeTab, setActiveTab] = useState('overview'); // overview, reservations, pending, guests, flats, history, settings
@@ -107,6 +107,18 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       showToast(err.message || 'Error reviewing stay extension.');
+    }
+  };
+
+  const handleVerifyId = async (id, { action, flagReason, notes }) => {
+    try {
+      await verifyId(id, { action, flagReason, notes });
+      showToast(`ID document ${action === 'flag' ? 'flagged' : action + 'd'} successfully.`);
+      if (selectedReservation && selectedReservation.id === id) {
+        setSelectedReservation(null);
+      }
+    } catch (err) {
+      showToast(err.message || 'Error updating ID verification.');
     }
   };
 
@@ -1062,6 +1074,7 @@ export default function AdminDashboard() {
           onClose={() => setSelectedReservation(null)}
           onUpdateStatus={handleStatusChange}
           onReviewExtension={handleReviewExtension}
+          onVerifyId={handleVerifyId}
         />
       )}
 
