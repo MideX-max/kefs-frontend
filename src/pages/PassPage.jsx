@@ -140,8 +140,8 @@ export default function PassPage() {
   const canExtend = reservation.status !== 'Rejected' && reservation.status !== 'Pending Review';
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-surface)', minHeight: '100vh', padding: '3.5rem 0 5rem' }}>
-      <div className="container">
+    <div style={{ backgroundColor: 'var(--bg-surface)', minHeight: '100vh', padding: '3.5rem 0 5rem', overflowX: 'hidden' }}>
+      <div className="container" style={{ overflowX: 'hidden' }}>
         
         {/* Back Link */}
         <div className="no-print" style={{ marginBottom: '1.75rem' }}>

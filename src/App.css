@@ -758,6 +758,16 @@
     max-width: 90vw;
     margin: 1rem;
   }
+  
+  /* Pass card tablet adjustments */
+  .kas-pass-paper {
+    max-width: 100% !important;
+  }
+  
+  .pass-sig-row,
+  .kas-pass-paper > div:nth-child(4) {
+    gap: 1.5rem !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -870,6 +880,10 @@
   }
   .step-label {
     font-size: 0.75rem;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 70px;
   }
   .kas-pass-paper {
     padding: 1.25rem 0.75rem 1rem;
@@ -953,6 +967,135 @@
   .modal-body,
   .modal-footer {
     padding: 1rem;
+  }
+  
+  /* Form card adjustments for mobile */
+  .card {
+    padding: 1.5rem !important;
+  }
+  
+  /* Ensure all text wraps properly */
+  h1, h2, h3, h4, p, span, strong, label {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+  
+  /* File upload dropzone mobile adjustment */
+  .file-upload-dropzone {
+    padding: 1.5rem 1rem !important;
+  }
+  
+  /* Pass card mobile adjustments */
+  .kas-pass-paper {
+    padding: 1.5rem 1rem 1.25rem !important;
+    max-width: 100% !important;
+    border-width: 1.5px !important;
+  }
+  
+  .pass-corner-accent {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  
+  .pass-corner-tl,
+  .pass-corner-tr {
+    top: 6px !important;
+  }
+  
+  .pass-corner-bl,
+  .pass-corner-br {
+    bottom: 6px !important;
+  }
+  
+  .pass-corner-tl,
+  .pass-corner-bl {
+    left: 6px !important;
+  }
+  
+  .pass-corner-tr,
+  .pass-corner-br {
+    right: 6px !important;
+  }
+  
+  /* Pass signature section - stack vertically on mobile */
+  .pass-sig-row,
+  .kas-pass-paper > div:nth-child(4) {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .pass-sig-img,
+  .kas-pass-paper img[alt*="Signature"] {
+    max-height: 50px !important;
+    max-width: 100% !important;
+  }
+  
+  /* Pass metadata bar - stack on mobile */
+  .pass-meta-bar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+  
+  /* Pass field values - smaller on mobile */
+  .pass-line-value {
+    font-size: 1rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  
+  /* Pass dates - stack on mobile */
+  .pass-line-dates {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+  
+  /* Pass field labels - allow wrapping on mobile */
+  .pass-line-row > span:first-child {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+  
+  /* Pass page container adjustments */
+  .pass-actions {
+    width: 100% !important;
+    justify-content: stretch !important;
+  }
+  
+  .pass-actions .btn {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+  
+  /* Pass page status banner */
+  .no-print > div:nth-child(2) {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  /* Pass page instructions card */
+  .no-print > div:nth-child(4) {
+    padding: 1.5rem !important;
+  }
+  
+  /* Extend form on mobile */
+  .no-print.card {
+    padding: 1.5rem !important;
+  }
+  
+  /* Pass header text */
+  .kas-pass-paper h1 {
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  .kas-pass-paper p {
+    font-size: 0.85rem !important;
+  }
+  
+  /* Pass notice section */
+  .kas-pass-paper > div:nth-child(3) {
+    font-size: 0.8rem !important;
   }
 }
 
@@ -1094,6 +1237,15 @@
   }
   .form-col {
     width: 100%;
+  }
+  
+  /* Fix step label overflow on mobile */
+  .wizard-stepper .step-label {
+    font-size: 0.7rem;
+    white-space: normal;
+    word-wrap: break-word;
+    text-align: center;
+    max-width: 60px;
   }
 }
 

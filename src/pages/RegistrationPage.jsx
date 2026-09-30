@@ -422,7 +422,7 @@ export default function RegistrationPage() {
 
                       {/* Date & Time Selection BEFORE Document Upload */}
                       <div style={{ padding: '1.25rem', backgroundColor: '#ffffff', border: '1px solid #bae6fd', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem' }}>
-                        <strong style={{ fontSize: '0.875rem', color: '#0369a1', display: 'block', marginBottom: '0.75rem' }}>
+                        <strong style={{ fontSize: '0.875rem', color: '#0369a1', display: 'block', marginBottom: '0.75rem', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
                           📅 Step 1: Select Stay Dates &amp; Expected Arrival/Departure Times
                         </strong>
                         
@@ -481,7 +481,7 @@ export default function RegistrationPage() {
                         </div>
                       </div>
 
-                      <strong style={{ fontSize: '0.875rem', color: '#0369a1', display: 'block', marginBottom: '0.5rem' }}>
+                      <strong style={{ fontSize: '0.875rem', color: '#0369a1', display: 'block', marginBottom: '0.5rem', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
                         📄 Step 2: Upload Airbnb Booking Document
                       </strong>
                       <FileUpload

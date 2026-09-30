@@ -165,6 +165,7 @@ export default function FileUpload({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
+          className="file-upload-dropzone"
           style={{
             border: dragActive ? '2px solid var(--brand-gold)' : '2px dashed var(--border-medium)',
             backgroundColor: dragActive ? 'var(--brand-gold-subtle)' : 'var(--bg-surface)',

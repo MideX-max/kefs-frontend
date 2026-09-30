@@ -43,7 +43,9 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
         width: '100%',
         margin: '0 auto',
         fontFamily: "'Inter', sans-serif",
-        color: '#111111'
+        color: '#111111',
+        overflow: 'hidden',
+        overflowX: 'hidden'
       }}
     >
       {/* Decorative Corner Sunburst Accents matching physical reference */}
@@ -165,7 +167,7 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
         </div>
 
         {/* Signatures Section */}
-        <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'flex-start' }}>
+        <div className="pass-sig-row" style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'flex-start' }}>
           
           {/* Guest / Flat Owner Signature */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
