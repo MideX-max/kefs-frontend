@@ -31,13 +31,20 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     // Small delay to ensure rendering is complete
     await new Promise(resolve => setTimeout(resolve, 500));
 
+    // Get the full dimensions including overflow content
+    const rect = element.getBoundingClientRect();
+    const fullHeight = Math.max(element.scrollHeight, element.offsetHeight, rect.height);
+    const fullWidth = Math.max(element.scrollWidth, element.offsetWidth, rect.width);
+
     // Temporarily remove overflow hidden to capture full content
     const originalOverflow = element.style.overflow;
     const originalOverflowX = element.style.overflowX;
     const originalOverflowY = element.style.overflowY;
+    const originalMaxWidth = element.style.maxWidth;
     element.style.overflow = 'visible';
     element.style.overflowX = 'visible';
     element.style.overflowY = 'visible';
+    element.style.maxWidth = 'none';
 
     // Capture element with html2canvas at high resolution
     const canvas = await html2canvas(element, {
@@ -46,19 +53,22 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
       allowTaint: true,
       logging: false,
       backgroundColor: '#ffffff',
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
+      windowWidth: fullWidth,
+      windowHeight: fullHeight,
       scrollX: 0,
       scrollY: 0,
+      width: fullWidth,
+      height: fullHeight,
       onclone: (clonedDoc) => {
         // Ensure cloned element has proper dimensions and no overflow
         const clonedElement = clonedDoc.getElementById(element.id) || element;
-        clonedElement.style.width = element.scrollWidth + 'px';
-        clonedElement.style.height = element.scrollHeight + 'px';
+        clonedElement.style.width = fullWidth + 'px';
+        clonedElement.style.height = fullHeight + 'px';
         clonedElement.style.overflow = 'visible';
         clonedElement.style.overflowX = 'visible';
         clonedElement.style.overflowY = 'visible';
         clonedElement.style.maxWidth = 'none';
+        clonedElement.style.minHeight = fullHeight + 'px';
       }
     });
 
@@ -66,6 +76,7 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     element.style.overflow = originalOverflow;
     element.style.overflowX = originalOverflowX;
     element.style.overflowY = originalOverflowY;
+    element.style.maxWidth = originalMaxWidth;
 
     const imgData = canvas.toDataURL('image/png', 0.95);
 
