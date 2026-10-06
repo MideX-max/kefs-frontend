@@ -11,15 +11,37 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
       throw new Error('Gate pass element not found for PDF export.');
     }
 
+    // Save original styles
+    const originalOverflow = element.style.overflow;
+    const originalMaxWidth = element.style.maxWidth;
+    const originalWidth = element.style.width;
+
+    // Temporarily remove constraints for full capture
+    element.style.overflow = 'visible';
+    element.style.maxWidth = '740px';
+    element.style.width = '740px';
+
+    // Wait for layout to update
+    await new Promise(resolve => setTimeout(resolve, 300));
+
     // Capture element with html2canvas at high resolution
     const canvas = await html2canvas(element, {
       scale: 3, // High DPI for crisp printing
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight
+      windowWidth: 740,
+      windowHeight: element.scrollHeight,
+      scrollX: 0,
+      scrollY: 0,
+      width: 740,
+      height: element.scrollHeight
     });
+
+    // Restore original styles
+    element.style.overflow = originalOverflow;
+    element.style.maxWidth = originalMaxWidth;
+    element.style.width = originalWidth;
 
     const imgData = canvas.toDataURL('image/png');
 
