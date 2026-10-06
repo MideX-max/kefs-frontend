@@ -31,22 +31,41 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     // Small delay to ensure rendering is complete
     await new Promise(resolve => setTimeout(resolve, 500));
 
+    // Temporarily remove overflow hidden to capture full content
+    const originalOverflow = element.style.overflow;
+    const originalOverflowX = element.style.overflowX;
+    const originalOverflowY = element.style.overflowY;
+    element.style.overflow = 'visible';
+    element.style.overflowX = 'visible';
+    element.style.overflowY = 'visible';
+
     // Capture element with html2canvas at high resolution
     const canvas = await html2canvas(element, {
-      scale: 2, // Reduced from 3 to prevent memory issues
+      scale: 2,
       useCORS: true,
       allowTaint: true,
       logging: false,
       backgroundColor: '#ffffff',
       windowWidth: element.scrollWidth,
       windowHeight: element.scrollHeight,
+      scrollX: 0,
+      scrollY: 0,
       onclone: (clonedDoc) => {
-        // Ensure cloned element has proper dimensions
+        // Ensure cloned element has proper dimensions and no overflow
         const clonedElement = clonedDoc.getElementById(element.id) || element;
         clonedElement.style.width = element.scrollWidth + 'px';
         clonedElement.style.height = element.scrollHeight + 'px';
+        clonedElement.style.overflow = 'visible';
+        clonedElement.style.overflowX = 'visible';
+        clonedElement.style.overflowY = 'visible';
+        clonedElement.style.maxWidth = 'none';
       }
     });
+
+    // Restore original overflow styles
+    element.style.overflow = originalOverflow;
+    element.style.overflowX = originalOverflowX;
+    element.style.overflowY = originalOverflowY;
 
     const imgData = canvas.toDataURL('image/png', 0.95);
 
