@@ -46,8 +46,10 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     clone.style.minHeight = 'auto';
     clone.style.display = 'block';
     clone.style.opacity = '1';
+    clone.style.padding = '3rem 2.75rem 2.5rem';
+    clone.style.border = '2px solid #111111';
 
-    // Force all children to be visible
+    // Force all children to be visible and remove height constraints
     const allChildren = clone.querySelectorAll('*');
     allChildren.forEach(child => {
       child.style.overflow = 'visible';
@@ -55,31 +57,56 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
       child.style.overflowY = 'visible';
       child.style.maxHeight = 'none';
       child.style.maxWidth = 'none';
+      child.style.minHeight = 'auto';
+      child.style.height = 'auto';
     });
 
     // Add clone to document temporarily
     document.body.appendChild(clone);
 
-    // Wait for clone to render
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Wait for clone to render and ensure images load
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Get dimensions
+    // Wait for clone images to load
+    const cloneImages = clone.getElementsByTagName('img');
+    const imagePromises = Array.from(cloneImages).map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+        setTimeout(resolve, 2000);
+      });
+    });
+    await Promise.all(imagePromises);
+
+    // Get natural dimensions after full render
     const fullHeight = clone.scrollHeight;
     const fullWidth = clone.scrollWidth;
 
-    // Capture the clone
+    console.log('Clone dimensions:', { fullHeight, fullWidth });
+
+    // Capture the clone with explicit dimensions
     const canvas = await html2canvas(clone, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      logging: false,
+      logging: true,
       backgroundColor: '#ffffff',
       windowWidth: fullWidth,
       windowHeight: fullHeight,
       scrollX: 0,
       scrollY: 0,
       width: fullWidth,
-      height: fullHeight
+      height: fullHeight,
+      onclone: (clonedDoc) => {
+        const clonedElement = clonedDoc.getElementById('kas-pass-clone');
+        if (clonedElement) {
+          clonedElement.style.width = fullWidth + 'px';
+          clonedElement.style.height = fullHeight + 'px';
+          clonedElement.style.overflow = 'visible';
+          clonedElement.style.maxWidth = 'none';
+        }
+      }
     });
 
     // Remove clone from document
@@ -102,6 +129,8 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     const usableWidth = pdfWidth - (margin * 2);
     const imgProps = pdf.getImageProperties(imgData);
     const usableHeight = (imgProps.height * usableWidth) / imgProps.width;
+
+    console.log('PDF dimensions:', { imgProps, usableWidth, usableHeight });
 
     // Position centered vertically if within page bounds
     const posY = usableHeight < (pdfHeight - margin * 2)
