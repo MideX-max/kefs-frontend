@@ -28,69 +28,63 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     // Wait for all images to load before capturing
     await waitForImages(element);
 
-    // Small delay to ensure rendering is complete
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Force the element to show full content temporarily
+    const originalOverflow = element.style.overflow;
+    const originalOverflowX = element.style.overflowX;
+    const originalOverflowY = element.style.overflowY;
+    const originalMaxWidth = element.style.maxWidth;
+    const originalHeight = element.style.height;
 
-    // Get current dimensions
-    const rect = element.getBoundingClientRect();
-    const scrollHeight = element.scrollHeight;
-    const scrollWidth = element.scrollWidth;
+    element.style.overflow = 'visible';
+    element.style.overflowX = 'visible';
+    element.style.overflowY = 'visible';
+    element.style.maxWidth = '2000px';
+    element.style.height = 'auto';
 
-    console.log('Element dimensions:', { 
-      clientHeight: element.clientHeight, 
-      scrollHeight, 
-      offsetHeight: element.offsetHeight,
-      clientWidth: element.clientWidth,
-      scrollWidth,
-      offsetWidth: element.offsetWidth
+    // Force all children to show full content
+    const allChildren = element.querySelectorAll('*');
+    allChildren.forEach(child => {
+      child.dataset.originalOverflow = child.style.overflow;
+      child.style.overflow = 'visible';
     });
 
-    // Capture the element with onclone to remove constraints
+    // Wait for layout to update
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Get the full scrollable dimensions
+    const fullHeight = element.scrollHeight;
+    const fullWidth = element.scrollWidth;
+
+    // Capture with html2canvas
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      logging: true,
+      logging: false,
       backgroundColor: '#ffffff',
-      windowWidth: scrollWidth,
-      windowHeight: scrollHeight,
+      windowWidth: fullWidth,
+      windowHeight: fullHeight,
       scrollX: 0,
       scrollY: 0,
-      width: scrollWidth,
-      height: scrollHeight,
-      onclone: (clonedDoc) => {
-        const clonedElement = clonedDoc.getElementById(element.id);
-        if (clonedElement) {
-          // Remove all overflow constraints
-          clonedElement.style.overflow = 'visible';
-          clonedElement.style.overflowX = 'visible';
-          clonedElement.style.overflowY = 'visible';
-          clonedElement.style.maxWidth = 'none';
-          clonedElement.style.width = scrollWidth + 'px';
-          clonedElement.style.height = scrollHeight + 'px';
-          clonedElement.style.minHeight = scrollHeight + 'px';
+      width: fullWidth,
+      height: fullHeight
+    });
 
-          // Remove constraints from all children
-          const allChildren = clonedElement.querySelectorAll('*');
-          allChildren.forEach(child => {
-            child.style.overflow = 'visible';
-            child.style.overflowX = 'visible';
-            child.style.overflowY = 'visible';
-            child.style.maxHeight = 'none';
-            child.style.maxWidth = 'none';
-            child.style.minHeight = 'auto';
-            child.style.height = 'auto';
-          });
-        }
+    // Restore original styles
+    element.style.overflow = originalOverflow;
+    element.style.overflowX = originalOverflowX;
+    element.style.overflowY = originalOverflowY;
+    element.style.maxWidth = originalMaxWidth;
+    element.style.height = originalHeight;
+
+    allChildren.forEach(child => {
+      if (child.dataset.originalOverflow !== undefined) {
+        child.style.overflow = child.dataset.originalOverflow;
+        delete child.dataset.originalOverflow;
       }
     });
 
     const imgData = canvas.toDataURL('image/png', 0.95);
-
-    console.log('Canvas dimensions:', { 
-      width: canvas.width, 
-      height: canvas.height 
-    });
 
     // Create PDF in portrait orientation (standard A4)
     const pdf = new jsPDF({
@@ -107,8 +101,6 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     const usableWidth = pdfWidth - (margin * 2);
     const imgProps = pdf.getImageProperties(imgData);
     const usableHeight = (imgProps.height * usableWidth) / imgProps.width;
-
-    console.log('PDF dimensions:', { imgProps, usableWidth, usableHeight });
 
     // Position centered vertically if within page bounds
     const posY = usableHeight < (pdfHeight - margin * 2)
