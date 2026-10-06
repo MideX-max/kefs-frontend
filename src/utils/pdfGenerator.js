@@ -31,88 +31,66 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     // Small delay to ensure rendering is complete
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Clone the element to avoid affecting the UI
-    const clone = element.cloneNode(true);
-    clone.id = 'kas-pass-clone';
-    clone.style.position = 'absolute';
-    clone.style.left = '-9999px';
-    clone.style.top = '0';
-    clone.style.overflow = 'visible';
-    clone.style.overflowX = 'visible';
-    clone.style.overflowY = 'visible';
-    clone.style.maxWidth = 'none';
-    clone.style.width = '740px';
-    clone.style.height = 'auto';
-    clone.style.minHeight = 'auto';
-    clone.style.display = 'block';
-    clone.style.opacity = '1';
-    clone.style.padding = '3rem 2.75rem 2.5rem';
-    clone.style.border = '2px solid #111111';
+    // Get current dimensions
+    const rect = element.getBoundingClientRect();
+    const scrollHeight = element.scrollHeight;
+    const scrollWidth = element.scrollWidth;
 
-    // Force all children to be visible and remove height constraints
-    const allChildren = clone.querySelectorAll('*');
-    allChildren.forEach(child => {
-      child.style.overflow = 'visible';
-      child.style.overflowX = 'visible';
-      child.style.overflowY = 'visible';
-      child.style.maxHeight = 'none';
-      child.style.maxWidth = 'none';
-      child.style.minHeight = 'auto';
-      child.style.height = 'auto';
+    console.log('Element dimensions:', { 
+      clientHeight: element.clientHeight, 
+      scrollHeight, 
+      offsetHeight: element.offsetHeight,
+      clientWidth: element.clientWidth,
+      scrollWidth,
+      offsetWidth: element.offsetWidth
     });
 
-    // Add clone to document temporarily
-    document.body.appendChild(clone);
-
-    // Wait for clone to render and ensure images load
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Wait for clone images to load
-    const cloneImages = clone.getElementsByTagName('img');
-    const imagePromises = Array.from(cloneImages).map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise((resolve) => {
-        img.onload = resolve;
-        img.onerror = resolve;
-        setTimeout(resolve, 2000);
-      });
-    });
-    await Promise.all(imagePromises);
-
-    // Get natural dimensions after full render
-    const fullHeight = clone.scrollHeight;
-    const fullWidth = clone.scrollWidth;
-
-    console.log('Clone dimensions:', { fullHeight, fullWidth });
-
-    // Capture the clone with explicit dimensions
-    const canvas = await html2canvas(clone, {
+    // Capture the element with onclone to remove constraints
+    const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
       logging: true,
       backgroundColor: '#ffffff',
-      windowWidth: fullWidth,
-      windowHeight: fullHeight,
+      windowWidth: scrollWidth,
+      windowHeight: scrollHeight,
       scrollX: 0,
       scrollY: 0,
-      width: fullWidth,
-      height: fullHeight,
+      width: scrollWidth,
+      height: scrollHeight,
       onclone: (clonedDoc) => {
-        const clonedElement = clonedDoc.getElementById('kas-pass-clone');
+        const clonedElement = clonedDoc.getElementById(element.id);
         if (clonedElement) {
-          clonedElement.style.width = fullWidth + 'px';
-          clonedElement.style.height = fullHeight + 'px';
+          // Remove all overflow constraints
           clonedElement.style.overflow = 'visible';
+          clonedElement.style.overflowX = 'visible';
+          clonedElement.style.overflowY = 'visible';
           clonedElement.style.maxWidth = 'none';
+          clonedElement.style.width = scrollWidth + 'px';
+          clonedElement.style.height = scrollHeight + 'px';
+          clonedElement.style.minHeight = scrollHeight + 'px';
+
+          // Remove constraints from all children
+          const allChildren = clonedElement.querySelectorAll('*');
+          allChildren.forEach(child => {
+            child.style.overflow = 'visible';
+            child.style.overflowX = 'visible';
+            child.style.overflowY = 'visible';
+            child.style.maxHeight = 'none';
+            child.style.maxWidth = 'none';
+            child.style.minHeight = 'auto';
+            child.style.height = 'auto';
+          });
         }
       }
     });
 
-    // Remove clone from document
-    document.body.removeChild(clone);
-
     const imgData = canvas.toDataURL('image/png', 0.95);
+
+    console.log('Canvas dimensions:', { 
+      width: canvas.width, 
+      height: canvas.height 
+    });
 
     // Create PDF in portrait orientation (standard A4)
     const pdf = new jsPDF({
