@@ -31,46 +31,44 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
     // Small delay to ensure rendering is complete
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Save all original styles
-    const originalStyles = {
-      overflow: element.style.overflow,
-      overflowX: element.style.overflowX,
-      overflowY: element.style.overflowY,
-      maxWidth: element.style.maxWidth,
-      width: element.style.width,
-      height: element.style.height,
-      minHeight: element.style.minHeight,
-      position: element.style.position,
-      display: element.style.display
-    };
-
-    // Force element to expand to show all content
-    element.style.overflow = 'visible';
-    element.style.overflowX = 'visible';
-    element.style.overflowY = 'visible';
-    element.style.maxWidth = '2000px';
-    element.style.width = '740px';
-    element.style.height = 'auto';
-    element.style.minHeight = 'auto';
-    element.style.position = 'relative';
-    element.style.display = 'block';
+    // Clone the element to avoid affecting the UI
+    const clone = element.cloneNode(true);
+    clone.id = 'kas-pass-clone';
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.overflow = 'visible';
+    clone.style.overflowX = 'visible';
+    clone.style.overflowY = 'visible';
+    clone.style.maxWidth = 'none';
+    clone.style.width = '740px';
+    clone.style.height = 'auto';
+    clone.style.minHeight = 'auto';
+    clone.style.display = 'block';
+    clone.style.opacity = '1';
 
     // Force all children to be visible
-    const allChildren = element.querySelectorAll('*');
+    const allChildren = clone.querySelectorAll('*');
     allChildren.forEach(child => {
-      child.dataset.originalOverflow = child.style.overflow;
       child.style.overflow = 'visible';
+      child.style.overflowX = 'visible';
+      child.style.overflowY = 'visible';
+      child.style.maxHeight = 'none';
+      child.style.maxWidth = 'none';
     });
 
-    // Wait for layout to update
+    // Add clone to document temporarily
+    document.body.appendChild(clone);
+
+    // Wait for clone to render
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    // Get the full dimensions after forcing expansion
-    const fullHeight = element.scrollHeight;
-    const fullWidth = element.scrollWidth;
+    // Get dimensions
+    const fullHeight = clone.scrollHeight;
+    const fullWidth = clone.scrollWidth;
 
-    // Capture element with html2canvas
-    const canvas = await html2canvas(element, {
+    // Capture the clone
+    const canvas = await html2canvas(clone, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
@@ -81,42 +79,11 @@ export async function generatePassPDF(elementOrId, filename = 'KEFFI_APARTMENT_P
       scrollX: 0,
       scrollY: 0,
       width: fullWidth,
-      height: fullHeight,
-      onclone: (clonedDoc) => {
-        const clonedElement = clonedDoc.getElementById(element.id) || element;
-        clonedElement.style.width = fullWidth + 'px';
-        clonedElement.style.height = fullHeight + 'px';
-        clonedElement.style.overflow = 'visible';
-        clonedElement.style.maxWidth = 'none';
-        clonedElement.style.minHeight = fullHeight + 'px';
-        clonedElement.style.position = 'relative';
-
-        // Force all cloned children to be visible
-        const clonedChildren = clonedElement.querySelectorAll('*');
-        clonedChildren.forEach(child => {
-          child.style.overflow = 'visible';
-        });
-      }
+      height: fullHeight
     });
 
-    // Restore all original styles
-    element.style.overflow = originalStyles.overflow;
-    element.style.overflowX = originalStyles.overflowX;
-    element.style.overflowY = originalStyles.overflowY;
-    element.style.maxWidth = originalStyles.maxWidth;
-    element.style.width = originalStyles.width;
-    element.style.height = originalStyles.height;
-    element.style.minHeight = originalStyles.minHeight;
-    element.style.position = originalStyles.position;
-    element.style.display = originalStyles.display;
-
-    // Restore children overflow
-    allChildren.forEach(child => {
-      if (child.dataset.originalOverflow !== undefined) {
-        child.style.overflow = child.dataset.originalOverflow;
-        delete child.dataset.originalOverflow;
-      }
-    });
+    // Remove clone from document
+    document.body.removeChild(clone);
 
     const imgData = canvas.toDataURL('image/png', 0.95);
 
