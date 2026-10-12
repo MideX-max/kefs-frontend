@@ -101,40 +101,17 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* Mobile Actions Right */}
-          <div style={{ display: 'none', alignItems: 'center', gap: '0.75rem' }} className="mobile-nav-right">
+          {/* Mobile Menu Button */}
+          <div className="mobile-only-header-actions">
             <button
               onClick={() => setNotifPanelOpen(!notifPanelOpen)}
               className="kas-nav-notif-btn"
-              title="Notifications"
-            >
-              <Bell size={22} />
-              {unreadCount > 0 && (
-                <span className="kas-nav-notif-badge">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-            <button
-              className="mobile-nav-toggle"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle navigation menu"
-            >
-              {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
-            </button>
-          </div>
-
-          {/* Mobile Menu Button for standard responsive display */}
-          <div className="mobile-only-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <button
-              onClick={() => setNotifPanelOpen(!notifPanelOpen)}
-              className="kas-nav-notif-btn mobile-notif-trigger"
               aria-label="Notifications"
             >
               <Bell size={22} />
               {unreadCount > 0 && (
                 <span className="kas-nav-notif-badge">
-                  {unreadCount}
+                  {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </button>
@@ -150,58 +127,49 @@ export default function Navbar() {
 
         {/* Notification Panel on Mobile */}
         {notifPanelOpen && (
-          <div className="kas-mobile-notif-dropdown">
+          <div className={`kas-mobile-notif-dropdown ${notifPanelOpen ? 'open' : ''}`}>
             <NotificationPanel onClose={() => setNotifPanelOpen(false)} />
           </div>
         )}
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div style={{
-            padding: '1.25rem 0 1.75rem',
-            borderTop: '1px solid var(--border-light)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.75rem',
-            backgroundColor: '#ffffff'
-          }}>
+          <div className={`kas-mobile-nav-drawer ${mobileMenuOpen ? 'open' : ''}`}>
             <Link
               to="/"
-              className={`kas-nav-link ${isActive('/') ? 'active' : ''}`}
+              className={`kas-mobile-nav-link ${isActive('/') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
-              style={{ padding: '0.5rem' }}
             >
               Home
             </Link>
             <Link
               to="/guest-access"
-              className={`kas-nav-link ${isActive('/guest-access') ? 'active' : ''}`}
+              className={`kas-mobile-nav-link ${isActive('/guest-access') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
-              style={{ padding: '0.5rem' }}
             >
               Guest Registration
             </Link>
             <Link
               to="/status"
-              className={`kas-nav-link ${isActive('/status') ? 'active' : ''}`}
+              className={`kas-mobile-nav-link ${isActive('/status') ? 'active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
-              style={{ padding: '0.5rem' }}
             >
               Check Reservation
             </Link>
 
-            <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div className="kas-mobile-nav-divider">
               {isAuthenticated ? (
                 <>
                   <Link
                     to="/admin"
                     className="btn btn-dark"
                     onClick={() => setMobileMenuOpen(false)}
+                    style={{ width: '100%' }}
                   >
                     <LayoutDashboard size={18} color="var(--brand-gold)" />
                     Facility Manager Dashboard
                   </Link>
-                  <button onClick={handleLogout} className="btn btn-outline">
+                  <button onClick={handleLogout} className="btn btn-outline" style={{ width: '100%' }}>
                     <LogOut size={16} />
                     Sign Out
                   </button>
@@ -212,6 +180,7 @@ export default function Navbar() {
                     to="/guest-access"
                     className="btn btn-primary"
                     onClick={() => setMobileMenuOpen(false)}
+                    style={{ width: '100%' }}
                   >
                     <UserPlus size={18} />
                     Register Guest
@@ -220,6 +189,7 @@ export default function Navbar() {
                     to="/login"
                     className="btn btn-outline"
                     onClick={() => setMobileMenuOpen(false)}
+                    style={{ width: '100%' }}
                   >
                     <Shield size={18} />
                     Facility Manager Login

@@ -270,15 +270,15 @@ export default function RegistrationPage() {
   const steps = airbnbFlow ? airbnbSteps : normalSteps;
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-surface)', minHeight: '100vh', padding: '3.5rem 0 5rem' }}>
+    <div className="registration-page-wrapper">
       <div className="container-narrow">
         
         {/* Page Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <span style={{ color: 'var(--brand-gold-dark)', fontWeight: 800, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '0.4rem' }}>
             KSA CONCIERGE SERVICES
           </span>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--brand-black)', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
+          <h1 className="registration-page-title">
             Guest Registration &amp; Gate Pass Form
           </h1>
           <p style={{ color: 'var(--text-sub)', fontSize: '1rem', maxWidth: '580px', margin: '0 auto' }}>
@@ -310,7 +310,7 @@ export default function RegistrationPage() {
         </div>
 
         {/* Main Card Form Container */}
-        <div className="card" style={{ padding: '2.5rem', backgroundColor: '#ffffff', boxShadow: 'var(--shadow-md)' }}>
+        <div className="card wizard-form-card">
           <form onSubmit={handleSubmit}>
             
             {/* ================= STEP 1: GUEST DETAILS ================= */}

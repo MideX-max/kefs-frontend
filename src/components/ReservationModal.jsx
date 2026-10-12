@@ -203,7 +203,7 @@ export default function ReservationModal({ reservation, onClose, onUpdateStatus,
                       </span>
                     </div>
                     <p style={{ fontSize: '0.875rem', color: '#78350f', margin: '0 0 1rem 0' }}>
-                      Guest has requested to extend their checkout from <strong>{formatDatePass(checkOutDate)}</strong> to <strong>{formatDatePass(extensionRequest.requestedCheckOutDate)}</strong>.
+                      Guest has requested to extend their checkout from <strong>{formatDatePass(checkOutDate)} ({checkOutTime || '11:00'})</strong> to <strong>{formatDatePass(extensionRequest.requestedCheckOutDate)} ({extensionRequest.requestedCheckOutTime || checkOutTime || '11:00'})</strong>.
                     </p>
                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                       <button

@@ -24,7 +24,7 @@ export default function LandingPage() {
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
       
       {/* 1. Hero Section */}
-      <section className="hero-section" style={{ textAlign: 'center', padding: '5rem 0 4rem' }}>
+      <section className="hero-section text-center">
         <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
           
           <div style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
@@ -38,23 +38,23 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <h1 className="hero-title" style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>
+          <h1 className="hero-title">
             KEFFI APARTMENT SUITES
           </h1>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-            <div style={{ width: '35px', height: '2px', backgroundColor: 'var(--brand-gold)' }}></div>
-            <span style={{ fontSize: '1.1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--brand-black)' }}>
+          <div className="hero-tagline-container">
+            <div className="hero-tagline-line"></div>
+            <span className="hero-tagline-text">
               Guest Registration &amp; Access Management
             </span>
-            <div style={{ width: '35px', height: '2px', backgroundColor: 'var(--brand-gold)' }}></div>
+            <div className="hero-tagline-line"></div>
           </div>
 
-          <p className="hero-subtitle" style={{ margin: '0 auto 2.5rem', maxWidth: '720px' }}>
+          <p className="hero-subtitle">
             Welcome to the digital guest management portal for KEFFI APARTMENT SUITES. Apartment managers can register their guest stay, submit identification, and receive an official verified digital gate pass for seamless estate entry.
           </p>
 
-          <div className="hero-actions" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
+          <div className="hero-actions">
             <Link to="/guest-access" className="btn btn-primary btn-lg">
               <UserPlus size={20} />
               Register Guest
@@ -66,7 +66,7 @@ export default function LandingPage() {
           </div>
 
           {/* Security Bullet points */}
-          <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap', fontSize: '0.875rem', color: 'var(--text-sub)', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)' }}>
+          <div className="hero-perks">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <CheckCircle2 size={17} color="#10b981" />
               <span>Instant Automated Approval</span>
@@ -110,7 +110,7 @@ export default function LandingPage() {
                   setSearchId(e.target.value);
                   setSearchError('');
                 }}
-                style={{ padding: '0.75rem 1rem' }}
+                style={{ padding: '0.75rem 1rem', flex: 1 }}
               />
               <button type="submit" className="btn btn-primary" style={{ flexShrink: 0 }}>
                 Find Pass
@@ -296,25 +296,39 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div style={{
-                backgroundColor: 'var(--bg-surface)',
-                border: '1px solid var(--border-light)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '2rem',
-                textAlign: 'center'
-              }}>
-                <Building2 size={40} color="var(--brand-gold-dark)" style={{ margin: '0 auto 1rem' }} />
-                <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--brand-black)', marginBottom: '0.5rem' }}>
-                  Facility Manager Access
-                </h4>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-sub)', marginBottom: '1.5rem' }}>
-                  Property managers, estate administrators, and front-desk personnel can sign in to inspect guest submissions, review flagged documents, and configure access settings.
-                </p>
-                <Link to="/login" className="btn btn-dark" style={{ width: '100%' }}>
-                  <ShieldCheck size={18} color="var(--brand-gold)" />
-                  Sign In to Management Portal
-                </Link>
-              </div>
+                          <div style={{
+  backgroundColor: 'var(--bg-surface)',
+  border: '1px solid var(--border-light)',
+  borderRadius: 'var(--radius-lg)',
+  padding: 'clamp(1rem, 4vw, 2rem)',
+  textAlign: 'center',
+  boxSizing: 'border-box',
+  width: '100%'
+}}>
+  <Building2 size={40} color="var(--brand-gold-dark)" style={{ margin: '0 auto 1rem' }} />
+  <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--brand-black)', marginBottom: '0.5rem' }}>
+    Facility Manager Access
+  </h4>
+  <p style={{ fontSize: '0.875rem', color: 'var(--text-sub)', marginBottom: '1.5rem' }}>
+   Property managers, estate administrators, and front-desk personnel can sign in to inspect guest submissions, review flagged documents, and configure access settings.
+  </p>
+  <Link
+    to="/login"
+    className="btn btn-dark"
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '0.5rem',
+      width: '100%',
+      maxWidth: '320px',
+      boxSizing: 'border-box'
+    }}
+  >
+    <ShieldCheck size={18} color="var(--brand-gold)" />
+    Sign In to Management Portal
+  </Link>
+</div>
             </div>
           </div>
         </div>

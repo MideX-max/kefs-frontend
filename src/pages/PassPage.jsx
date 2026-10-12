@@ -19,6 +19,7 @@ export default function PassPage() {
   const [extending, setExtending] = useState(false);
   const [showExtendForm, setShowExtendForm] = useState(false);
   const [newCheckOutDate, setNewCheckOutDate] = useState('');
+  const [newCheckOutTime, setNewCheckOutTime] = useState('');
   const [extendError, setExtendError] = useState('');
 
   const passCardRef = useRef(null);
@@ -30,6 +31,9 @@ export default function PassPage() {
       try {
         const data = await getReservationById(passId);
         setReservation(data);
+        if (data?.checkOutTime) {
+          setNewCheckOutTime(data.checkOutTime);
+        }
       } catch (err) {
         console.error('Failed to load pass:', err);
       } finally {
@@ -83,9 +87,17 @@ export default function PassPage() {
     setExtendError('');
     
     try {
-      const updatedReservation = await extendStay(reservation.id || reservation.passId, newCheckOutDate);
+      const selectedTime = newCheckOutTime || reservation.checkOutTime || '11:00';
+      const updatedReservation = await extendStay(
+        reservation.id || reservation.passId, 
+        newCheckOutDate, 
+        selectedTime
+      );
       if (updatedReservation) {
         setReservation(updatedReservation);
+        if (updatedReservation.checkOutTime) {
+          setNewCheckOutTime(updatedReservation.checkOutTime);
+        }
       }
       setShowExtendForm(false);
       setNewCheckOutDate('');
@@ -172,7 +184,7 @@ export default function PassPage() {
               <StatusBadge status={reservation.status} size="md" />
             </div>
             <p style={{ color: 'var(--text-sub)', fontSize: '0.925rem' }}>
-              Guest: <strong>{reservation.guestName}</strong> • Suite: <strong>{reservation.flat}</strong> • Stay: <strong>{formatDatePass(reservation.checkInDate)} &rarr; {formatDatePass(reservation.checkOutDate)}</strong>
+              Guest: <strong>{reservation.guestName}</strong> • Suite: <strong>{reservation.flat}</strong> • Stay: <strong>{formatDatePass(reservation.checkInDate)} ({reservation.checkInTime || '14:00'}) &rarr; {formatDatePass(reservation.checkOutDate)} ({reservation.checkOutTime || '11:00'})</strong>
               {reservation.verificationNotes && reservation.verificationNotes.includes('extended') && (
                 <span style={{ marginLeft: '0.5rem', color: '#166534', fontSize: '0.85rem', fontWeight: 600 }}>
                   (Extended)
@@ -182,7 +194,7 @@ export default function PassPage() {
 
             {reservation.extensionRequest?.status === 'pending' && (
               <div style={{ marginTop: '0.75rem', padding: '0.6rem 0.85rem', backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: 'var(--radius-sm)', color: '#92400e', fontSize: '0.85rem' }}>
-                <strong>Stay Extension Pending:</strong> Request to extend stay until <strong>{formatDatePass(reservation.extensionRequest.requestedCheckOutDate)}</strong> is awaiting Facility Manager verification.
+                <strong>Stay Extension Pending:</strong> Request to extend stay until <strong>{formatDatePass(reservation.extensionRequest.requestedCheckOutDate)} ({reservation.extensionRequest.requestedCheckOutTime || reservation.checkOutTime || '11:00'})</strong> is awaiting Facility Manager verification.
               </div>
             )}
           </div>
@@ -244,15 +256,15 @@ export default function PassPage() {
               </div>
               <div>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--brand-black)', margin: 0 }}>
-                  Extend Your Stay at Keffi Suites
+                  Extend Your Guest Stay at Keffi Pass
                 </h3>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-                  Current Check-out: <strong>{formatDatePass(reservation.checkOutDate)}</strong>
+                  Current Check-out: <strong>{formatDatePass(reservation.checkOutDate)} ({reservation.checkOutTime || '11:00'})</strong>
                 </p>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', alignItems: 'flex-end', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', alignItems: 'flex-end', marginBottom: '1.25rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: 'var(--brand-black)', marginBottom: '0.5rem' }}>
                   Select New Check-Out Date
@@ -263,6 +275,19 @@ export default function PassPage() {
                   value={newCheckOutDate}
                   onChange={(e) => setNewCheckOutDate(e.target.value)}
                   min={getMinExtensionDate()}
+                  style={{ width: '100%', height: '44px', fontWeight: 600 }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: 'var(--brand-black)', marginBottom: '0.5rem' }}>
+                  Select New Check-Out Time
+                </label>
+                <input
+                  type="time"
+                  className="form-input"
+                  value={newCheckOutTime || reservation.checkOutTime || '11:00'}
+                  onChange={(e) => setNewCheckOutTime(e.target.value)}
                   style={{ width: '100%', height: '44px', fontWeight: 600 }}
                 />
               </div>
@@ -303,7 +328,7 @@ export default function PassPage() {
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
               <button
                 type="button"
-                onClick={() => { setShowExtendForm(false); setNewCheckOutDate(''); setExtendError(''); }}
+                onClick={() => { setShowExtendForm(false); setNewCheckOutDate(''); setNewCheckOutTime(reservation.checkOutTime || '11:00'); setExtendError(''); }}
                 className="btn btn-outline"
                 disabled={extending}
               >

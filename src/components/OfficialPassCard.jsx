@@ -33,20 +33,6 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
       ref={ref} 
       className={`kas-pass-paper pass-printable-container ${className}`}
       id="kas-official-guest-pass"
-      style={{
-        position: 'relative',
-        backgroundColor: '#ffffff',
-        border: '2px solid #111111',
-        padding: '3rem 2.75rem 2.5rem',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
-        maxWidth: '740px',
-        width: '100%',
-        margin: '0 auto',
-        fontFamily: "'Inter', sans-serif",
-        color: '#111111',
-        overflow: 'hidden',
-        overflowX: 'hidden'
-      }}
     >
       {/* Decorative Corner Sunburst Accents matching physical reference */}
       <img src="/corner-accent.svg" alt="" className="pass-corner-accent pass-corner-tl" />
@@ -62,78 +48,47 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
       )}
 
       {/* 1. Header: KS Logo Centered */}
-      <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+      <div className="pass-header">
         <img
           src="/logo.png"
           alt="KEFFI APARTMENT SUITES"
-          style={{
-            height: '92px',
-            width: 'auto',
-            margin: '0 auto 0.5rem',
-            display: 'block',
-            objectFit: 'contain'
-          }}
+          className="pass-logo-img"
         />
-        <h1 style={{
-          fontSize: '1.35rem',
-          fontWeight: 800,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
-          color: '#000000',
-          margin: '0.25rem 0',
-          lineHeight: '1.3'
-        }}>
+        <h1 className="pass-title-main">
           KEFFI APARTMENT SUITES GUEST RESERVATION
         </h1>
-        <p style={{
-          fontSize: '1rem',
-          fontWeight: 500,
-          color: '#262626',
-          margin: '0'
-        }}>
+        <p className="pass-subtitle">
           The details of your reservation for access into the Estate:
         </p>
         {(airbnbBooking || airbnbScreenshotUrl) && (
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            marginTop: '0.6rem',
-            padding: '0.25rem 0.75rem',
-            backgroundColor: '#ff5a5f15',
-            border: '1px solid #ff5a5f40',
-            borderRadius: '20px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            color: '#d93900'
-          }}>
-            <span style={{ fontSize: '0.85rem' }}>🏠</span> Verified Airbnb Booking Document Attached
+          <div className="pass-airbnb-badge">
+            <span>🏠</span> Verified Airbnb Booking Document Attached
           </div>
         )}
       </div>
 
       {/* 2. Dotted Field Lines matching physical reference */}
-      <div style={{ margin: '2rem 0 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
+      <div className="pass-fields-container">
         
         {/* NAME Field */}
-        <div className="pass-line-row" style={{ fontSize: '1.15rem' }}>
-          <span style={{ fontWeight: 800, color: '#000000', letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>
+        <div className="pass-line-row">
+          <span className="pass-line-label">
             NAME:
           </span>
-          <div className="pass-line-slot" style={{ marginLeft: '0.5rem', minHeight: '32px' }}>
-            <span className="pass-line-value" style={{ fontSize: '1.35rem' }}>
+          <div className="pass-line-slot">
+            <span className="pass-line-value">
               {guestName || "—"}
             </span>
           </div>
         </div>
 
         {/* FLAT NO Field */}
-        <div className="pass-line-row" style={{ fontSize: '1.15rem' }}>
-          <span style={{ fontWeight: 800, color: '#000000', letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>
+        <div className="pass-line-row">
+          <span className="pass-line-label">
             FLAT NO:
           </span>
-          <div className="pass-line-slot" style={{ marginLeft: '0.5rem', minHeight: '32px' }}>
-            <span className="pass-line-value" style={{ fontSize: '1.35rem' }}>
+          <div className="pass-line-slot">
+            <span className="pass-line-value">
               {flat || "—"}
             </span>
           </div>
@@ -142,24 +97,24 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
         {/* START DATE & END DATE Field */}
         <div className="pass-line-dates">
           {/* Start Date */}
-          <div className="pass-line-row" style={{ flex: 1, fontSize: '1.1rem' }}>
-            <span style={{ fontWeight: 800, color: '#000000', whiteSpace: 'nowrap' }}>
+          <div className="pass-line-row pass-date-field">
+            <span className="pass-line-label">
               START DATE:
             </span>
-            <div className="pass-line-slot" style={{ marginLeft: '0.4rem', minHeight: '30px' }}>
-              <span className="pass-line-value" style={{ fontSize: '1.2rem' }}>
+            <div className="pass-line-slot">
+              <span className="pass-line-value">
                 {formatDatePass(checkInDate)}
               </span>
             </div>
           </div>
 
           {/* End Date */}
-          <div className="pass-line-row" style={{ flex: 1, fontSize: '1.1rem' }}>
-            <span style={{ fontWeight: 800, color: '#000000', whiteSpace: 'nowrap' }}>
+          <div className="pass-line-row pass-date-field">
+            <span className="pass-line-label">
               END DATE:
             </span>
-            <div className="pass-line-slot" style={{ marginLeft: '0.4rem', minHeight: '30px' }}>
-              <span className="pass-line-value" style={{ fontSize: '1.2rem' }}>
+            <div className="pass-line-slot">
+              <span className="pass-line-value">
                 {formatDatePass(checkOutDate)}
               </span>
             </div>
@@ -167,27 +122,19 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
         </div>
 
         {/* Signatures Section */}
-        <div className="pass-sig-row" style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'row', gap: '2rem', alignItems: 'flex-start' }}>
+        <div className="pass-signatures-container">
           
           {/* Guest / Flat Owner Signature */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span style={{ fontWeight: 800, fontSize: '0.85rem', textTransform: 'uppercase', color: '#000000', letterSpacing: '0.02em' }}>
+          <div className="pass-sig-block">
+            <span className="pass-sig-caption">
               FLAT OWNERS/REPRESENTATIVE’S SIGNATURE :
             </span>
-            <div style={{
-              borderBottom: '2px dotted #444444',
-              minHeight: '65px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative'
-            }}>
+            <div className="pass-sig-slot">
               {signatureUrl ? (
                 <img
                   src={signatureUrl}
                   alt="Representative Signature"
                   className="pass-sig-img"
-                  style={{ maxHeight: '60px', objectFit: 'contain' }}
                 />
               ) : (
                 <span style={{ fontSize: '0.85rem', color: '#888888', fontStyle: 'italic' }}>
@@ -198,23 +145,15 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
           </div>
 
           {/* Facility Manager's Signature */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span style={{ fontWeight: 800, fontSize: '0.85rem', textTransform: 'uppercase', color: '#000000', letterSpacing: '0.02em' }}>
+          <div className="pass-sig-block">
+            <span className="pass-sig-caption">
               FACILITY MANAGER’S SIGNATURE:
             </span>
-            <div style={{
-              borderBottom: '2px dotted #444444',
-              minHeight: '65px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative'
-            }}>
+            <div className="pass-sig-slot">
               <img
                 src={managerSignatureUrl || DEFAULT_MANAGER_SIG}
                 alt="Facility Manager Signature"
                 className="pass-sig-img"
-                style={{ maxHeight: '60px', objectFit: 'contain' }}
               />
             </div>
           </div>
@@ -224,18 +163,11 @@ const OfficialPassCard = forwardRef(function OfficialPassCard({ reservation, cla
       </div>
 
       {/* 3. Official Bottom Notice matching physical reference pass */}
-      <div style={{
-        marginTop: '1.75rem',
-        paddingTop: '1.25rem',
-        borderTop: '1.5px solid #d1d5db',
-        fontSize: '0.925rem',
-        lineHeight: '1.45',
-        color: '#1a1a1a'
-      }}>
-        <div>
-          <span style={{ fontWeight: 800, color: '#000000' }}>NB:</span> Access into the premises will only be granted after the form has been properly filled and signed by management.
+      <div className="pass-notice-box">
+        <div className="pass-notice-text">
+          <span className="pass-notice-nb">NB:</span> Access into the premises will only be granted after the form has been properly filled and signed by management.
         </div>
-        <div style={{ fontStyle: 'italic', marginTop: '0.35rem', fontWeight: 500 }}>
+        <div className="pass-notice-italic">
           Upon expiration, the gate pass can no longer be used.
         </div>
       </div>

@@ -203,11 +203,15 @@ export const api = {
     return data.admin;
   },
 
-  async extendStay(id, newCheckOutDate) {
+  async extendStay(id, newCheckOutDate, newCheckOutTime = '') {
+    const payload = typeof newCheckOutDate === 'object'
+      ? newCheckOutDate
+      : { newCheckOutDate, newCheckOutTime };
+
     const data = await requestJson(`/reservations/${encodeURIComponent(id)}/extend-stay`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...guestAuthHeaders() },
-      body: JSON.stringify({ newCheckOutDate })
+      body: JSON.stringify(payload)
     });
 
     return {

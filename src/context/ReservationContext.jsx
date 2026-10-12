@@ -134,10 +134,10 @@ export function ReservationProvider({ children }) {
     return api.getReservation(idOrPassId);
   };
 
-  const extendStay = async (id, newCheckOutDate) => {
+  const extendStay = async (id, newCheckOutDate, newCheckOutTime = '') => {
     setLoading(true);
     try {
-      const res = await api.extendStay(id, newCheckOutDate);
+      const res = await api.extendStay(id, newCheckOutDate, newCheckOutTime);
       await fetchReservations();
       return res.reservation;
     } finally {
